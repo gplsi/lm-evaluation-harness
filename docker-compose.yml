@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  lm-evaluation-harness:
+    image: lm-evaluation-harness
+    container_name: lm-evaluation-harness
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0  # Specify the GPUs you want to use (GPU 0)
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Enable GPU capabilities
+    network_mode: "host"  # Use host network (same as --network="host" in docker run)
+    stdin_open: true  # Keeps the stdin open (interactive mode)
+    tty: true  # Allocate a pseudo-TTY (interactive terminal)
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+              device_ids: ["0"]  # Reserve GPU 0 (or you can just rely on NVIDIA_VISIBLE_DEVICES)
+
+    #volumes:
+    #  - /raid/gplsi/robiert/docker_vol/Odesia_Challenge/:/workspace
+    #  - /raid/gplsi/NAS/GPLSI/:/workspace/NAS
