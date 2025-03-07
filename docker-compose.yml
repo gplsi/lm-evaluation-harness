@@ -5,7 +5,7 @@ services:
     image: lm-evaluation-harness
     container_name: lm-evaluation-harness
     environment:
-      - NVIDIA_VISIBLE_DEVICES=0  # Specify the GPUs you want to use (GPU 0)
+      - NVIDIA_VISIBLE_DEVICES=all  # Make all GPUs visible  # Specify the GPUs you want to use (GPU 0)
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Enable GPU capabilities
       - WANDB_API_KEY=${WANDB_API_KEY} # Pass the API key dynamically
       - MODEL_ID_HUGGING_FACE=${MODEL_ID_HUGGING_FACE} # Pass the MODELNAME dynamically
@@ -18,8 +18,9 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-              device_ids: ["0"]  # Reserve GPU 0 (or you can just rely on NVIDIA_VISIBLE_DEVICES)
+              device_ids: ["all"]  # Let the container use all GPUs
 
     #volumes:
+    #- ../outputLogs/:/outputLogs
     #  - /raid/gplsi/robiert/docker_vol/Odesia_Challenge/:/workspace
     #  - /raid/gplsi/NAS/GPLSI/:/workspace/NAS
