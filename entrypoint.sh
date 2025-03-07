@@ -3,7 +3,7 @@
 wandb login $WANDB_API_KEY  # Authenticate W&B
 
 # Run tasks sequentially
-./execAllScripts.sh $MODEL_ID_HUGGING_FACE PRUEBA $WANDB_PROJECT
+./execAllScripts.sh $MODEL_ID_HUGGING_FACE  $WANDB_PROJECT
 
 
 # Keep the container alive

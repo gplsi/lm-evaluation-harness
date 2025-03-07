@@ -11,6 +11,38 @@ This branch of [lm-evaluation-harness]() is designed to build a *Docker* image o
 
 This setup allows for streamlined and reproducible model evaluation across different linguistic benchmarks.
 
+> At this moment the docker container only launches the task corresponding to *spanish*,*catalan* and *english* tasks.
+
 ## Configuration
+
+In order to use [lm-evaluation-harness] inside a docker container, you have to follow this steps.
+
+1. Clone the repository and swith to branch docker.
+
+```
+git clone https://github.com/gplsi/lm-evaluation-harness.git
+```
+
+2. Create the `.env` in which different configurations(*model-name*,*model-path*,*wandb-configuration*) will be set. 
+```.env
+WANDB_API_KEY=<<WANDB api key>>
+MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
+WANDB_PROJECT=<<Project name>>
+```
+
+3. Configure the volume that you will use to store the logs of the container in [docker-compose.yml](./docker-compose.yml).
+
+> In our [docker-compose.yml](./docker-compose.yml) we define a folder named **outputLogs** at the same directory level in which the repo was cloned.
+
+4. Build the image.
+```bash
+docker build --network=host  -t lm-evaluation-harness .
+```
+
+5. Execute the container.
+```bash
+docker compose up
+```
+
 
 

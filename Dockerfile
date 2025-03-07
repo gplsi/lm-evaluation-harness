@@ -17,7 +17,7 @@ RUN chmod +x /app/launch_scripts/entrypoint.sh
 
 WORKDIR /app/launch_scripts
 
-#CMD ["/bin/bash", "entrypoint.sh"]
-CMD ["/bin/bash"]
+CMD ["/bin/bash", "entrypoint.sh"]
+#CMD ["/bin/bash"]
 
 
