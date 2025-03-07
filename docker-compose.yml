@@ -7,6 +7,8 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=0  # Specify the GPUs you want to use (GPU 0)
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Enable GPU capabilities
+      - WANDB_API_KEY=${WANDB_API_KEY} # Pass the API key dynamically
+      - MODEL_ID_HUGGING_FACE=${MODEL_ID_HUGGING_FACE} # Pass the MODELNAME dynamically
     network_mode: "host"  # Use host network (same as --network="host" in docker run)
     stdin_open: true  # Keeps the stdin open (interactive mode)
     tty: true  # Allocate a pseudo-TTY (interactive terminal)

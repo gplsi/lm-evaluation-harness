@@ -10,6 +10,13 @@ COPY . /app
 WORKDIR /app
 
 RUN pip install -e . --verbose
+RUN pip install wandb
+    
+COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
+RUN chmod +x /app/launch_scripts/entrypoint.sh 
 
-CMD ["/bin/bash"]
+WORKDIR /app/launch_scripts
+
+CMD ["/bin/bash", "entrypoint.sh"]
+
 
