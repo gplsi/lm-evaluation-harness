@@ -45,4 +45,12 @@ docker compose up
 ```
 
 
+## How it works
+This container runs a series of tasks corresponding to the spanish bench. The results of the evaluation is presented in the mounted foulder in the root folder named `./results`.
+
+In addition, there is a mounted folder named `./outputLogs` where the logs of the different evaluation processes will be stored.
+
+
+
+
 

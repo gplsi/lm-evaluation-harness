@@ -11,6 +11,7 @@ dataset=$2
 few_shot=$3
 tensor_parallelism=$4
 wandb=$5
+execution_name=$6
 
 if [ "$computer" == "polaris" ]; then
     job_id=$PBS_JOBID
@@ -20,7 +21,7 @@ else
 fi          
 
 # output_dir=results/$(basename ${model})/results:$(basename ${model}):${dataset}:${few_shot}-shot_${job_id}.json
-output_dir=results/$(basename ${model})/results:$(basename ${model}):${dataset}:${few_shot}-shot_${job_id}.json
+output_dir=results/$(basename ${model})/results:$(basename ${model}):${execution_name}:${few_shot}-shot_${job_id}
 
 cuda_device_count=$(python -c "import torch; print(torch.cuda.device_count())")
 echo "Available GPUs: $cuda_device_count"

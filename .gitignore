@@ -24,3 +24,5 @@ lm_eval/caching/.cache
 wandb
 examples/wandb
 .env
+outputLogs
+results

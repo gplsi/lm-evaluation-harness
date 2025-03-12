@@ -3,7 +3,7 @@ version: '3.8'
 services:
   lm-evaluation-harness:
     image: lm-evaluation-harness
-    container_name: lm-evaluation-harness
+    container_name: gplsi_lm-evaluation-harness
     environment:
       - NVIDIA_VISIBLE_DEVICES=all  # Make all GPUs visible  # Specify the GPUs you want to use (GPU 0)
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Enable GPU capabilities
@@ -19,9 +19,10 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-              device_ids: ["all"]  # Let the container use all GPUs
+              device_ids: ["0","3","4"]  # Let the container use all GPUs
 
     volumes:
-    - ../outputLogs/:/outputLogs
+    - ./outputLogs/:/outputLogs
+    - ./results/:/app/results
     #  - /raid/gplsi/robiert/docker_vol/Odesia_Challenge/:/workspace
     #  - /raid/gplsi/NAS/GPLSI/:/workspace/NAS
