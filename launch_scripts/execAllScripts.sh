@@ -22,6 +22,10 @@ echo "Directory created: $OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"
 mkdir -p "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"
 echo o
 
+# Valencian commands
+echo "Executing Valencian commands..."
+yes | ./execute_task_love.sh "$MODEL_ROUTE" cocoteros_va 5 False $WANDB 1_Valencian > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_Valencian.txt" 2>&1  || true
+
 # Spanish commands
 echo "Executing Spanish commands..."
 yes | ./execute_task_love.sh "$MODEL_ROUTE" belebele_spa_Latn,wnli_es,xnli_es,xstorycloze_es,xquad_es 5 False $WANDB 1_Spanish > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_Spanish.txt" 2>&1  || true

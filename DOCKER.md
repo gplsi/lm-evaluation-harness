@@ -44,11 +44,18 @@ docker build --network=host  -t lm-evaluation-harness .
 docker compose up
 ```
 
+>> In case you want to use all the GPUs in the host machine you must set in the [docker-compose.yml](./docker-compose.yml) the **device_ids** to `"all"` in other case you have to introduce manually the device_ids.
+
 
 ## How it works
 This container runs a series of tasks corresponding to the spanish bench. The results of the evaluation is presented in the mounted foulder in the root folder named `./results`.
 
 In addition, there is a mounted folder named `./outputLogs` where the logs of the different evaluation processes will be stored.
+
+In order to modify the tasks that you want to evaluate the models on, you can modify the [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh) which is used as **entrypoint** of the docker container.
+
+
+
 
 
 
