@@ -23,7 +23,7 @@ In order to use [lm-evaluation-harness] inside a docker container, you have to f
 git clone https://github.com/gplsi/lm-evaluation-harness.git
 ```
 
-2. Create the `.env` in which different configurations(*model-name*,*model-path*,*wandb-configuration*) will be set. 
+2. Create the `.env` in which different configurations(*model-name*,*model-path*,*wandb-configuration*) will be set.
 ```.env
 WANDB_API_KEY=<<WANDB api key>>
 MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
@@ -53,11 +53,3 @@ This container runs a series of tasks corresponding to the spanish bench. The re
 In addition, there is a mounted folder named `./outputLogs` where the logs of the different evaluation processes will be stored.
 
 In order to modify the tasks that you want to evaluate the models on, you can modify the [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh) which is used as **entrypoint** of the docker container.
-
-
-
-
-
-
-
-

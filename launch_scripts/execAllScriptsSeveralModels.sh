@@ -21,14 +21,14 @@ echo "LOGS DIR: $logs_dir"
 for model_path in "${models[@]}"; do
   # Extract the model name (e.g., Aitana_intruction_english_v1)
   model_name=$(echo "$model_path" | cut -d'/' -f1)
-  
+
   # Extract the step (e.g., step-004080-hf or final-hf)
   step=$(echo "$model_path" | cut -d'/' -f2)
-  
+
   # Build the full model path
   #full_model_path="${base_dir}/${model_path}"
   full_model_path="${model_path}"
-  
+
   # Build the target directory for the results
   target_dir="${results_dir}/${step}"
 
@@ -45,13 +45,13 @@ for model_path in "${models[@]}"; do
   echo "LOG FILE: $log_file"
   echo "NEW DIR: $new_dir"
   echo
-  
+
   # Write header in the log file
   echo "Running script for ${model_name} - ${step} on $(date)" > "$log_file"
-  
+
   # Execute the script and log both stdout and stderr to the specific model's log file
   nohup ./execAllScripts.sh "$full_model_path" "${model_name}_${step}" "${wandb}" >> "$log_file" 2>&1
-  
+
   # Rename the target directory to include the model name and step
   if [ -d "$target_dir" ]; then
     new_dir="${results_dir}/${model_name}_${step}"
@@ -59,7 +59,7 @@ for model_path in "${models[@]}"; do
   else
     echo "Directory ${target_dir} not found" >> "$log_file"
   fi
-  
+
   # Log completion for this model
   echo "Finished script for ${model_name} - ${step} on $(date)" >> "$log_file"
   echo "------------------------------------------------------------" >> "$log_file"

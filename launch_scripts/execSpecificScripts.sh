@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-# This script is used for running specific benchmarks, if you want to run all the benchmarks, 
+# This script is used for running specific benchmarks, if you want to run all the benchmarks,
 # use execAllScripts.sh or execAllScriptsSeveralModels.sh for running several models at once.
 
 # Check if correct number of arguments are passed

@@ -1,6 +1,6 @@
-#!/bin/bash              
+#!/bin/bash
 
-cd /gpfs/projects/bsc88/evaluation/nemo/lm-evaluation-harness 
+cd /gpfs/projects/bsc88/evaluation/nemo/lm-evaluation-harness
 
 if [ "$computer" == "polaris" ]; then
     job_id=$PBS_JOBID
@@ -15,9 +15,9 @@ export HF_HOME=${cache_id}
 export SINGULARITY_CACHEDIR=./cache_singularity
 export SINGULARITY_TMPDIR=./cache_singularity
 export TORCHDYNAMO_SUPPRESS_ERRORS=True
-          
-model=$1  
-dataset=$2                                                                                                                                                                                                     
+
+model=$1
+dataset=$2
 few_shot=$3
 tensor_parallelism=$4
 
@@ -65,7 +65,7 @@ if [[ $model == *"nemo"* ]]; then
 else
     # If it doesn't contain ".nemo", assume it is hf
     echo "The model name does not contain '.nemo'."
-    if [ "${tensor_parallelism}" == "True" ]; then        
+    if [ "${tensor_parallelism}" == "True" ]; then
         python -m lm_eval --model hf \
             --model_args pretrained=$model,trust_remote_code=True,parallelize=True \
             --tasks ${dataset} \
@@ -74,7 +74,7 @@ else
             --output_path $output_dir \
             --log_samples \
             --seed 1234
-    else        
+    else
         accelerate launch -m lm_eval --model hf \
             --model_args pretrained=$model,trust_remote_code=True \
             --tasks ${dataset} \
@@ -83,7 +83,7 @@ else
             --output_path $output_dir \
             --log_samples \
             --seed 1234
-    fi  
+    fi
 fi
 
 # remove cache folder

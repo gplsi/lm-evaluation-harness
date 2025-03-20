@@ -171,25 +171,25 @@ num_fewshots=( 5 )
 
 catalan_bench_subtasks=(
     belebele_cat_Latn
-    xnli_ca        
-    catcola        
-    copa_ca        
-    openbookqa_ca  
-    parafraseja    
-    paws_ca        
-    piqa_ca        
-    siqa_ca        
-    teca           
-    wnli_ca        
-    arc_ca_easy    
+    xnli_ca
+    catcola
+    copa_ca
+    openbookqa_ca
+    parafraseja
+    paws_ca
+    piqa_ca
+    siqa_ca
+    teca
+    wnli_ca
+    arc_ca_easy
     arc_ca_challenge
-    xstorycloze_ca 
-    xquad_ca       
-    catalanqa      
+    xstorycloze_ca
+    xquad_ca
+    catalanqa
     coqcat
     flores_ca
-    cabreu         
-    mgsm_direct_ca 
+    cabreu
+    mgsm_direct_ca
     veritasqa_gen_ca
     veritasqa_mc1_ca
     veritasqa_mc2_ca
@@ -215,17 +215,17 @@ spanish_bench_subtasks=(
 
 galician_bench_subtasks=(
     belebele_glg_Latn
-    flores_gl       
-    galcola         
+    flores_gl
+    galcola
     summarization_gl
-    parafrases_gl   
-    paws_gl         
+    parafrases_gl
+    paws_gl
     mgsm_direct_gl
-    openbookqa_gl	
+    openbookqa_gl
     veritasqa_gen_gl
     veritasqa_mc1_gl
     veritasqa_mc2_gl
-    truthfulqa_gl	
+    truthfulqa_gl
 )
 
 basque_bench_subtasks=(
@@ -286,8 +286,8 @@ xstorycloze_list=(
 #     "xstorycloze_sw"
 #     "xstorycloze_te"
 #     "xstorycloze_zh"
-)           
-          
+)
+
 flores_list=(
     "flores_ca-de"
     "flores_ca-en"
@@ -327,7 +327,7 @@ xquad_list=(
     "xquad_tr"
     "xquad_vi"
     "xquad_zh"
-)           
+)
 
 xnli_list=(
     "xnli_ar"
@@ -534,7 +534,7 @@ do
                     echo $model $dataset $num_fewshot $tensor_parallelism
                     sbatch send_job_cesga.sh $model $dataset $num_fewshot $tensor_parallelism
                 elif [ "$computer" == "mn5" ]; then
-                    echo "Running evaluation on MN5."  
+                    echo "Running evaluation on MN5."
                     sed -i "2s/.*/#SBATCH --job-name=\"${job_name}\"/" send_job_${computer}.sh
                     sbatch send_job_mn5.sh $model $dataset $num_fewshot $tensor_parallelism
 #                     bash send_job_mn5.sh $model $dataset $num_fewshot $tensor_parallelism
@@ -555,4 +555,3 @@ do
         done
     done
 done
-

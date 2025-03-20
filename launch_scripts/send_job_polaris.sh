@@ -24,4 +24,4 @@ singularity exec --nv -B /eagle:/eagle -B /lus:/lus ../../nemo_2311 bash -c "
     bash /eagle/projects/tpc/bsc/nemo/lm-evaluation-harness/launch_scripts/execute_task.sh $model $dataset $num_fewshot $tensor_parallelism"
 #     bash /eagle/projects/tpc/bsc/lm-evaluation-harness/launch_scripts/polaris/execute_task_cesga.sh $model $dataset $num_fewshot $PBS_JOBID"
 
-echo "END TIME: "$(date) 
+echo "END TIME: "$(date)
