@@ -17,7 +17,7 @@ This setup allows for streamlined and reproducible model evaluation across diffe
 
 In order to use [lm-evaluation-harness] inside a docker container, you have to follow this steps.
 
-1. Clone the repository and swith to branch docker.
+1. Clone the repository and switch to branch docker.
 
 ```
 git clone https://github.com/gplsi/lm-evaluation-harness.git

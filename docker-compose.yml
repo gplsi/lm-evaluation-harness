@@ -24,5 +24,6 @@ services:
     volumes:
     - ./outputLogs/:/outputLogs
     - ./results/:/app/results
+    - ./reports/:/app/reports
     #  - /raid/gplsi/robiert/docker_vol/Odesia_Challenge/:/workspace
     #  - /raid/gplsi/NAS/GPLSI/:/workspace/NAS

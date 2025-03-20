@@ -16,6 +16,7 @@ RUN pip install wandb
 
 COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
 RUN chmod +x /app/launch_scripts/entrypoint.sh
+RUN mkdir -p /app/reports
 
 WORKDIR /app/launch_scripts
 
