@@ -19,11 +19,9 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-              device_ids: ["0","3","4"]  # Let the container use all GPUs
+              device_ids: ["all"]  # Let the container use all GPUs
 
     volumes:
     - ./outputLogs/:/outputLogs
     - ./results/:/app/results
     - ./reports/:/app/reports
-    #  - /raid/gplsi/robiert/docker_vol/Odesia_Challenge/:/workspace
-    #  - /raid/gplsi/NAS/GPLSI/:/workspace/NAS

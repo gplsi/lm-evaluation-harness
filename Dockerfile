@@ -1,6 +1,12 @@
 
 FROM nvcr.io/nvidia/pytorch:24.02-py3
 #FROM nvcr.io/nvidia/pytorch:25.02-py3
+
+# Argumentos para UID y GID
+ARG USER_ID
+ARG GROUP_ID
+
+
 RUN apt-get update --allow-insecure-repositories && \
     apt-get install -y --allow-unauthenticated git curl wget build-essential unzip && \
     rm -rf /var/lib/apt/lists/*
@@ -17,6 +23,12 @@ RUN pip install wandb
 COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
 RUN chmod +x /app/launch_scripts/entrypoint.sh
 RUN mkdir -p /app/reports
+
+# Crear el grupo y usuario con los IDs especificados
+RUN groupadd -g $GROUP_ID usergroup && \
+    useradd -m -u $USER_ID -g $GROUP_ID user && \
+    mkdir -p /app && \
+    chown -R user:usergroup /app
 
 WORKDIR /app/launch_scripts
 
