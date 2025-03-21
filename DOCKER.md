@@ -30,7 +30,7 @@ MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
 WANDB_PROJECT=<<Project name>>
 ```
 
-3. Configure the volume that you will use to store the logs of the container in [docker-compose.yml](./docker-compose.yml).
+3. Configure the volume that you will use to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).
 
 > In our [docker-compose.yml](./docker-compose.yml) we define a folder named **outputLogs** at the same directory level in which the repo was cloned.
 
@@ -53,3 +53,30 @@ This container runs a series of tasks corresponding to the spanish bench. The re
 In addition, there is a mounted folder named `./outputLogs` where the logs of the different evaluation processes will be stored.
 
 In order to modify the tasks that you want to evaluate the models on, you can modify the [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh) which is used as **entrypoint** of the docker container.
+
+A CSV with the results cleaned will be stored at `./reports` folder, this CSV is generated using [./launch_scripts/format_results.py] that process all the  evaluation results that are stored in  `./results` folder.
+
+## SLURM
+In order to deploy the docker container in **SLURM**  is an open-source job scheduler used for managing workloads on high-performance computing (HPC) clusters. It is responsible for allocating compute resources, scheduling jobs, and managing parallel execution across multiple nodes.
+
+To use our application with this framework we define a **simple slurm configuration** [p1.slurm](./p1.slurm).
+
+Inside this configuration file we define different params:
+- `#SBATCH --job-name=llm_evaluation_harness `: Name of the job to be launched.  
+- `#SBATCH --output=%j.out `: Name of the output files. *In this case, they are defined as <<id_job>>.out*  
+- `#SBATCH --error=%j.err`: Name of the error files. *In this case, they are defined as <<id_job>>.err*  
+- `#SBATCH --cpus-per-task=1 `: Number of CPUs per task.  
+- `#SBATCH --mem=1G`: Memory per node.  
+- `#SBATCH --partition=<<queue-name>>`: Queue to which the job is submitted.  
+- `#SBATCH --gres=gpu:2`: Requests 2 GPUs for execution.  
+- `#SBATCH --gres=shard:24`: Requests 24 shards of shared memory.  
+
+### Launch SLUM
+
+To launch the SLUM job you must be located in the project root directory and execute the following command.
+
+```bash
+sbatch p1.slurm
+```
+
+
