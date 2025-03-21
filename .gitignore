@@ -28,3 +28,5 @@ outputLogs
 results
 testhm
 reports
+*.err
+*.out
