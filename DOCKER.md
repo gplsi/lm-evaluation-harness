@@ -31,9 +31,11 @@ HUGGING_FACE_API_KEY==<<Hugging face api to access model that requires special p
 WANDB_PROJECT=<<Project name>>
 ```
 
-3. Configure the volume that you will use to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).
+3. Configure the volums that you will use to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).
 
 > In our [docker-compose.yml](./docker-compose.yml) we define a folder named **outputLogs** at the same directory level in which the repo was cloned.
+
+> In addition, in case that you want to use a downloaded model in `/home/NAS/GPLSI` directory, we suggest to use the same directory inside the volume to avoid confusion.
 
 4. Build the image.
 ```bash
@@ -82,6 +84,17 @@ To launch the SLUM job you must be located in the project root directory and exe
 
 ```bash
 sbatch p1.slurm
+```
+
+To stop a launched job.
+
+```bash
+scancel <<jobid>>
+```
+
+To see the running jobs.
+```bash
+scancel <<jobid>>
 ```
 
 

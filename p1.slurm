@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1             # Número de CPUs por tarea
 #SBATCH --mem=1G                      # Memoria por nodo
 #SBATCH --partition=titan           # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu 
 #SBATCH --gres=shard:24
 
 
