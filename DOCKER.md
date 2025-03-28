@@ -36,7 +36,11 @@ WANDB_PROJECT=<<Project name>>
 
 4. Build the image.
 ```bash
-docker build --network=host  -t lm-evaluation-harness .
+docker build --network=host \
+  --build-arg USER_ID=$(id -u) \
+  --build-arg GROUP_ID=$(id -g) \
+  -t lm-evaluation-harness .
+
 ```
 
 5. Execute the container.

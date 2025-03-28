@@ -25,3 +25,4 @@ services:
     - ./outputLogs/:/outputLogs
     - ./results/:/app/results
     - ./reports/:/app/reports
+    #- /home/NAS/GPLSI/:/home/NAS/GPLSI
