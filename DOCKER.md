@@ -27,6 +27,7 @@ git clone https://github.com/gplsi/lm-evaluation-harness.git
 ```.env
 WANDB_API_KEY=<<WANDB api key>>
 MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
+HUGGING_FACE_API_KEY==<<Hugging face api to access model that requires special permission to execute>>
 WANDB_PROJECT=<<Project name>>
 ```
 

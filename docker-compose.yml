@@ -5,10 +5,11 @@ services:
     image: lm-evaluation-harness
     container_name: gplsi_lm-evaluation-harness
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all  # Make all GPUs visible  # Specify the GPUs you want to use (GPU 0)
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility  # Enable GPU capabilities
-      - WANDB_API_KEY=${WANDB_API_KEY} # Pass the API key dynamically
-      - MODEL_ID_HUGGING_FACE=${MODEL_ID_HUGGING_FACE} # Pass the MODELNAME dynamically
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - WANDB_API_KEY=${WANDB_API_KEY}
+      - MODEL_ID_HUGGING_FACE=${MODEL_ID_HUGGING_FACE} 
+      - HF_TOKEN=${HF_TOKEN}
       - WANDB_PROJECT=$WANDB_PROJECT
     network_mode: "host"  # Use host network (same as --network="host" in docker run)
     stdin_open: true  # Keeps the stdin open (interactive mode)

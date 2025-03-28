@@ -19,6 +19,6 @@ R=`pwd`
 # Ejecuta tu programa aquí (reemplaza esto con lo que desees ejecutar)
 # Ejecutar el contenedor con acceso a la GPU
 docker build --network=host --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t lm-evaluation-harness .
-#docker run --gpus device=$SLURM_IDX --name $nombrecont --rm -v $R:/workspace pytorch-train python train_minist.py
+docker run --gpus device=$SLURM_IDX --name $nombrecont --rm -v $R:/workspace pytorch-train python train_minist.py
 docker compose up 
 echo "Trabajo finalizado a las `date`"
