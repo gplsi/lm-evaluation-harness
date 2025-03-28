@@ -19,6 +19,7 @@ RUN pip install -e . --verbose
 RUN pip uninstall pydantic -y
 RUN pip install --no-cache-dir pydantic
 RUN pip install wandb
+RUN pip install sentencepiece
 
 COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
 RUN chmod +x /app/launch_scripts/entrypoint.sh
