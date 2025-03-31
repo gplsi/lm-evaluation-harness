@@ -29,7 +29,7 @@ yes | ./execute_task_love.sh "$MODEL_ROUTE" cocoteros_va 5 False $WANDB 1_Valenc
 # Spanish commands
 echo "Executing Spanish commands..."
 yes | ./execute_task_love.sh "$MODEL_ROUTE" belebele_spa_Latn,wnli_es,xnli_es,xstorycloze_es,xquad_es 5 False $WANDB 1_Spanish > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_Spanish.txt" 2>&1  || true
-yes | ./execute_task_love.sh "$MODEL_ROUTE" paws_es,mgsm_direct_es_v2,phrases_es,cocoteros_es,xlsum_es 5 False $WANDB 2_Spanish > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_Spanish.txt" 2>&1 || true
+yes | ./execute_task_love.sh "$MODEL_ROUTE" paws_es_spanish_bench,mgsm_direct_es_spanish_bench,phrases_es,cocoteros_es,xlsum_es 5 False $WANDB 2_Spanish > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_Spanish.txt" 2>&1 || true
 yes | ./execute_task_love.sh "$MODEL_ROUTE" flores_es 5 False $WANDB 3_Spanish >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Spanish.txt"  2>&1  || true
 yes | ./execute_task_love.sh "$MODEL_ROUTE" phrases_va-es 5 False $WANDB 4_Spanish >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Spanish.txt" 2>&1 || true
 #
