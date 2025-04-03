@@ -34,8 +34,9 @@ yes | ./execute_task_love.sh "$MODEL_ROUTE" flores_es 5 False $WANDB 3_Spanish >
 yes | ./execute_task_love.sh "$MODEL_ROUTE" phrases_va-es 5 False $WANDB 4_Spanish >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Spanish.txt" 2>&1 || true
 #
 ## Catalan commands
+#xnli_va ommited
 echo "Executing Catalan commands..."
-yes | ./execute_task_love.sh "$MODEL_ROUTE" belebele_cat_Latn,xnli_ca,xnli_va,catcola,copa_ca,openbookqa_ca 5 False $WANDB 1_Catalan > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_Catalan.txt"  2>&1 || true
+yes | ./execute_task_love.sh "$MODEL_ROUTE" belebele_cat_Latn,xnli_ca,catcola,copa_ca,openbookqa_ca 5 False $WANDB 1_Catalan > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_Catalan.txt"  2>&1 || true
 yes | ./execute_task_love.sh "$MODEL_ROUTE" paws_ca,piqa_ca,siqa_ca,teca,wnli_ca,arc_ca_easy,arc_ca_challenge,xstorycloze_ca 5 False $WANDB 2_Catalan > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_Catalan.txt" 2>&1 || true
 yes | ./execute_task_love.sh "$MODEL_ROUTE" catalanqa,mgsm_direct_ca,phrases_va 5 False $WANDB 3_Catalan > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Catalan.txt" 2>&1 || true
 yes | ./execute_task_love.sh "$MODEL_ROUTE" flores_ca 5 False $WANDB > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Catalan.txt" 2>&1 || true
