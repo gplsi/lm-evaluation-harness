@@ -29,6 +29,8 @@ WANDB_API_KEY=<<WANDB api key>>
 MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
 HUGGING_FACE_API_KEY==<<Hugging face api to access model that requires special permission to execute>>
 WANDB_PROJECT=<<Project name>>
+USER_ID=USER_ID=$(id -u)
+GROUP_ID=$(id -g)
 ```
 
 3. Configure the volums that you will use to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).

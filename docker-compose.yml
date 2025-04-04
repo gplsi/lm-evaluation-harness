@@ -11,6 +11,8 @@ services:
       - MODEL_ID_HUGGING_FACE=${MODEL_ID_HUGGING_FACE} 
       - HF_TOKEN=${HF_TOKEN}
       - WANDB_PROJECT=$WANDB_PROJECT
+      - USER_ID=${USER_ID}
+      - GROUP_ID=${GROUP_ID}
     network_mode: "host"  # Use host network (same as --network="host" in docker run)
     stdin_open: true  # Keeps the stdin open (interactive mode)
     tty: true  # Allocate a pseudo-TTY (interactive terminal)
@@ -26,4 +28,5 @@ services:
     - ./outputLogs/:/outputLogs
     - ./results/:/app/results
     - ./reports/:/app/reports
+    - /home/NAS/GPLSI/odesiaChallenge/models/salamandra-2b-2epochs/checkpoints/hf_models:/models/salamandra-2b
     #- /home/NAS/GPLSI/:/home/NAS/GPLSI
