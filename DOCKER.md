@@ -26,12 +26,14 @@ git clone https://github.com/gplsi/lm-evaluation-harness.git
 2. Create the `.env` in which different configurations(*model-name*,*model-path*,*wandb-configuration*) will be set.
 ```.env
 WANDB_API_KEY=<<WANDB api key>>
-MODEL_ID_HUGGING_FACE=<<Model name/Model Path>>
+MODELS_TO_EVALUATE=<<Model name/Model Path>>
 HUGGING_FACE_API_KEY==<<Hugging face api to access model that requires special permission to execute>>
 WANDB_PROJECT=<<Project name>>
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
 ```
+> In order to evaluate multiple models you can define a list of models separated by commas with no spaces.
+Example: `MODELS_TO_EVALUATE=/models/salamandra-2b/iter-167999-ckpt.pth,BSC-LT/salamandraTA-2B,deepseek-ai/DeepSeek-R1`
 
 3. Configure the volums that you will use to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).
 
