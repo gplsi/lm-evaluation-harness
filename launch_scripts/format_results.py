@@ -98,7 +98,10 @@ def process_file(file_path):
         for m in task_config.get("metric_list", []):
             metric_name = m.get("metric")
             if metric_name:
-                metrics_list.append(metric_name)
+                if 'rouge1' in metric_name:
+                    metrics_list.append('rouge1')
+                else:
+                    metrics_list.append(metric_name)
         output_type = task_config.get("output_type")
         config_list.append({
             "file_name": file_name,
@@ -347,7 +350,7 @@ def generate_results(main_root_folder):
     merged_df["Random"] = merged_df["Random_x"]
     merged_df = merged_df.drop(['model', 'Metric', 'model_folder', "Random_y", "Random_x","model_name_sanitized"], axis=1)
 
-    first_cols= ["execution_datetime", "language", "task", "output_type","metric_list", "shots", "Random"]
+    first_cols= ["execution_datetime", "task", "output_type","metric_list", "shots", "Random"]
 
     # Crear una lista con el resto de columnas
     remaining_cols = [col for col in merged_df.columns if col not in first_cols]
@@ -361,7 +364,7 @@ def generate_results(main_root_folder):
     df_copy = df.copy()
     df_copy = df_copy.drop_duplicates()
     df_copy = df_copy.drop(['execution_datetime'], axis = 1)
-    df_grouped = df_copy.groupby(['metric_list', 'task', 'language', 'Random', 'output_type'], as_index=False).max()
+    df_grouped = df_copy.groupby(['metric_list', 'task', 'Random', 'output_type'], as_index=False).max()
     df = df_grouped.drop_duplicates().drop(['shots'], axis=1)
     return df
 
@@ -384,21 +387,21 @@ def highlight_nsmallest_nlargest(s, n=N):
 
 def style_results(df,root_folder):
     df = df.rename(columns={'metric_list':'metric'})
-    exclude_language = []
-    for i in df.language.unique():
-        if 'shot' in i:
-            exclude_language.append(i)
+    #exclude_language = []
+    #for i in df.language.unique():
+    #    if 'shot' in i:
+    #        exclude_language.append(i)
 
-    df = df[~df.language.isin(exclude_language)].reset_index(drop=True)
-    df.drop(columns=['output_type','Random'], inplace=True)
-    df = df.set_index(['task', 'metric','language'])
-    df.sort_index(level='language',inplace=True)
+    #df = df[~df.language.isin(exclude_language)].reset_index(drop=True)
+    df.drop(columns=['output_type','Random','language'], inplace=True)
+    df = df.set_index(['task', 'metric'])
+    #df.sort_index(level='language',inplace=True)
 
     
 
     df = df.style.apply(highlight_nsmallest_nlargest, axis=1)
     name = "Resultados_unidos_"
-    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") 
     file_name = name+now
     df.to_excel(root_folder+file_name+'.xlsx', engine='openpyxl', index=True, header=True)
     print(f"\n✅ Archivos guardado como {root_folder+file_name}.xlsx")
