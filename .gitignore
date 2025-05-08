@@ -26,6 +26,7 @@ examples/wandb
 .env
 outputLogs
 results
+results_final
 testhm
 reports
 *.err
