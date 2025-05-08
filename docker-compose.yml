@@ -8,11 +8,12 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - WANDB_API_KEY=${WANDB_API_KEY}
-      - MODELS_TO_EVALUATE=${MODELS_TO_EVALUATE} 
+      - MODELS_TO_EVALUATE=$MODELS_TO_EVALUATE} 
       - HF_TOKEN=${HF_TOKEN}
       - WANDB_PROJECT=$WANDB_PROJECT
       - USER_ID=${USER_ID}
       - GROUP_ID=${GROUP_ID}
+      - INSTRUCT_EVALUATION=${INSTRUCT_EVALUATION}
     network_mode: "host"  # Use host network (same as --network="host" in docker run)
     stdin_open: true  # Keeps the stdin open (interactive mode)
     tty: true  # Allocate a pseudo-TTY (interactive terminal)
@@ -22,11 +23,18 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-              device_ids: ["all"]  # Let the container use all GPUs
+              device_ids: ["0","3","4"]  # Let the container use all GPUs
 
     volumes:
     - ./outputLogs/:/outputLogs
-    - ./results/:/app/results
-    - ./reports/:/app/reports
-    - /home/NAS/GPLSI/odesiaChallenge/models/salamandra-2b-2epochs/checkpoints/hf_models:/models/salamandra-2b
+    - /home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/evaluaciones:/app/results
+    - ./home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/reports:/app/reports
+    - /home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/hf_models:/models
+    
+    #- /home/gplsi/NAS/GPLSI/HF_models:/models
+    #- /home/gplsi/NAS/GPLSI/odesiaChallenge/models:/models
     #- /home/NAS/GPLSI/:/home/NAS/GPLSI
+    #- /home/gplsi/NAS/mikel/outputLogs/:/outputLogs
+    #- /home/gplsi/NAS/mikel/results/:/app/results
+    #- /home/gplsi/NAS/mikel/reports/:/app/reports
+    #- /home/gplsi/NAS/GPLSI/llm-train-tokenizer-custom-dataset-main/modelos:/models

@@ -7,7 +7,8 @@ IFS=',' read -r -a arr_models <<< $MODELS_TO_EVALUATE
 # Loop in order to evaluate a list of models
 for model in "${arr_models[@]}"; do
     echo "Evaluating $model"
-    ./execAllScripts.sh $model $WANDB_PROJECT
+    echo "./execAllScripts.sh" $model $WANDB_PROJECT $INSTRUCT_EVALUATION
+    ./execAllScripts.sh $model $WANDB_PROJECT $INSTRUCT_EVALUATION
 done
 
 

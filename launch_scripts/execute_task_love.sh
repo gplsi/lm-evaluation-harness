@@ -12,6 +12,7 @@ few_shot=$3
 tensor_parallelism=$4
 wandb=$5
 execution_name=$6
+instruct=$7
 
 if [ "$computer" == "polaris" ]; then
     job_id=$PBS_JOBID
@@ -25,6 +26,8 @@ output_dir=results/$(basename ${model})/results:$(basename ${model}):${execution
 
 cuda_device_count=$(python -c "import torch; print(torch.cuda.device_count())")
 echo "Available GPUs: $cuda_device_count"
+echo "Instruct evaluation: $instruct"
+
 
 if [[ $model == *".nemo"* ]]; then
     # If it contains ".nemo", do the following
@@ -63,17 +66,46 @@ if [[ $model == *".nemo"* ]]; then
     fi
 else
     # If it doesn't contain ".nemo", assume it is hf
-    echo "The model name does not contain '.nemo'."
+    
+    
     if [ "${tensor_parallelism}" == "True" ]; then
-        python -m lm_eval --model hf \
-            --model_args pretrained=$model,trust_remote_code=True,parallelize=True \
-            --tasks ${dataset} \
-            --num_fewshot $few_shot \
-            --batch_size 1 \
-            --output_path $output_dir \
-            --log_samples \
-            --seed 1234
+        if [ "${instruct}" == "True" ]; then
+            echo "The model name does not contain '.nemo' and is an instruct model."
+            python -m lm_eval --model hf \
+                --model_args pretrained=$model,trust_remote_code=True,parallelize=True,instruct=True \
+                --tasks ${dataset} \
+                --num_fewshot $few_shot \
+                --batch_size 1 \
+                --output_path $output_dir \
+                --log_samples \
+                --apply_chat_template \
+                --seed 1234
+        else
+            echo "The model name does not contain '.nemo'."
+            python -m lm_eval --model hf \
+                --model_args pretrained=$model,trust_remote_code=True,parallelize=True \
+                --tasks ${dataset} \
+                --num_fewshot $few_shot \
+                --batch_size 1 \
+                --output_path $output_dir \
+                --log_samples \
+                --seed 1234
+        fi
     else
+        if [ "${instruct}" == "True" ]; then
+            echo "The model name does not contain '.nemo' and is an instruct model."
+            accelerate launch -m lm_eval --model hf \
+                        --model_args pretrained=$model,trust_remote_code=True \
+                        --tasks ${dataset} \
+                        --num_fewshot $few_shot \
+                        --batch_size 1 \
+                        --output_path $output_dir \
+                        --log_samples \
+                        --seed 1234 \
+                        --apply_chat_template \
+                        --wandb_args project=$wandb,entity=gplsi_continual
+        else
+        echo "The model name does not contain '.nemo'."
         accelerate launch -m lm_eval --model hf \
             --model_args pretrained=$model,trust_remote_code=True \
             --tasks ${dataset} \
@@ -83,5 +115,6 @@ else
             --log_samples \
             --seed 1234 \
             --wandb_args project=$wandb,entity=gplsi_continual
+        fi
     fi
 fi
