@@ -8,7 +8,7 @@ services:
       - NVIDIA_VISIBLE_DEVICES=all
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
       - WANDB_API_KEY=${WANDB_API_KEY}
-      - MODELS_TO_EVALUATE=$MODELS_TO_EVALUATE} 
+      - MODELS_TO_EVALUATE=$MODELS_TO_EVALUATE 
       - HF_TOKEN=${HF_TOKEN}
       - WANDB_PROJECT=$WANDB_PROJECT
       - USER_ID=${USER_ID}
@@ -23,14 +23,14 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-              device_ids: ["0","3","4"]  # Let the container use all GPUs
+              device_ids: ["all"] #["0","3","4"]  # Let the container use all GPUs
 
     volumes:
     - ./outputLogs/:/outputLogs
     - /home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/evaluaciones:/app/results
-    - ./home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/reports:/app/reports
+    - /home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/reports:/app/reports
     - /home/gplsi/NAS/GPLSI/ALIA/modelos/Instruction/Intruccion_v1_salamandra_2B/hf_models:/models
-    
+    #- /home/gplsi/NAS/GPLSI/HF_models/SALAMANDRA/modelos:/models
     #- /home/gplsi/NAS/GPLSI/HF_models:/models
     #- /home/gplsi/NAS/GPLSI/odesiaChallenge/models:/models
     #- /home/NAS/GPLSI/:/home/NAS/GPLSI
