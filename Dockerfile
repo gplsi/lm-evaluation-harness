@@ -1,6 +1,6 @@
 
 FROM nvcr.io/nvidia/pytorch:24.02-py3
-#FROM nvcr.io/nvidia/pytorch:25.02-py3
+#FROM nvcr.io/nvidia/pytorch:25.01-py3
 
 # Argumentos para UID y GID
 ARG USER_ID
