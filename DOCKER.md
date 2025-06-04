@@ -91,7 +91,7 @@ In addition, there is a mounted folder named `./outputLogs` where the logs of th
 
 In order to modify the tasks that you want to evaluate the models on, you can modify the [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh) which is used as **entrypoint** of the docker container.
 
-After the end of the evaluation a XLSX with the results cleaned will be stored at `./reports` folder, this CSV is generated using [./launch_scripts/format_results.py] that process all the  evaluation results that are stored in  `./results` folder.
+After the end of the evaluation a XLSX with the results cleaned will be stored at `./reports` folder, this CSV is generated using [./launch_scripts/format_results.py] that processes all the evaluation results that are stored in  `./results` folder.
 
 >> In case that you want to execute specific tasks we recommend to create a new *script* in [./launch_scripts](./launch_scripts/) directory and modify [./entrypoint.sh](./entrypoint.sh) to call the custom script instead of [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh).
 
