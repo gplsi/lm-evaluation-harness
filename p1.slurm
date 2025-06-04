@@ -2,10 +2,10 @@
 #SBATCH --job-name=llm_evaluation_harness          # Nombre del trabajo
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
-#SBATCH --cpus-per-task=32             # Número de CPUs por tarea
-#SBATCH --mem=64G                      # Memoria por nodo
-#SBATCH --partition=dgx           # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:2
+#SBATCH --cpus-per-task=16             # Número de CPUs por tarea
+#SBATCH --mem=32G                      # Memoria por nodo
+#SBATCH --partition=postiguet1          # Cola (partición) a la que enviar el trabajo
+#SBATCH --gres=gpu:1
 
 
 # Cargar variables de entorno desde el archivo .env
@@ -24,12 +24,22 @@ nvidia-smi
 R=`pwd`
 # Ejecuta tu programa aquí (reemplaza esto con lo que desees ejecutar)
 # Ejecutar el contenedor con acceso a la GPU
-#echo "Building lm-evaluation-harness Docker image..."
-#docker build --network=host --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t lm-evaluation-harness .
+echo "Checking if the container still active."
+docker stop gplsi_lm-evaluation-harness
+
+docker rm gplsi_lm-evaluation-harness
+
+
+echo "Building lm-evaluation-harness Docker image..."
+
+
+docker ps
+docker build --network=host --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t lm-evaluation-harness .
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
-  --gpus device=$CUDA_VISIBLE_DEVICES  \
+  --gpus all  \
   --network host \
+  --env CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES}" \
   --env NVIDIA_DRIVER_CAPABILITIES=compute,utility \
   --env WANDB_API_KEY="${WANDB_API_KEY}" \
   --env MODELS_TO_EVALUATE="${MODELS_TO_EVALUATE}" \
@@ -38,10 +48,13 @@ docker run --rm \
   --env USER_ID="${USER_ID}" \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
-  --volume /home/gplsi/GPLSI/evaluaciones/gemma-3-1b/reports:/app/reports \
-  --volume /home/gplsi/GPLSI/evaluaciones/gemma-3-1b/results:/app/results \
+  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/app/results \
+  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/app/reports \
+  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/Aitana_2B_S_v2/hf_models:/models \
   --volume ./outputLogs:/outputLogs \
   --name gplsi_lm-evaluation-harness \
   lm-evaluation-harness
+
+
 
 echo "Trabajo finalizado a las `date`"

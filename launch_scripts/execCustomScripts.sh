@@ -25,8 +25,8 @@ echo o
 
 ## Valencian commands
 echo "Executing EVALUATION commands..."
-yes | ./execute_task_love.sh "$MODEL_ROUTE" cocoteros_es 0 False $WANDB gemma_evaluation $INSTRUCT > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/Cocoteros.txt" 2>&1  || true
-yes | ./execute_task_love.sh "$MODEL_ROUTE" piqa_eu 5 False $WANDB gemma_evaluation $INSTRUCT > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/piqa_eu.txt" 2>&1 || true
+yes | ./execute_task_love.sh "$MODEL_ROUTE" cocoteros_es 5 False $WANDB gemma_evaluation $INSTRUCT > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/Cocoteros.txt" 2>&1  || true
+yes | ./execute_task_love.sh "$MODEL_ROUTE" piqa_eu 0 False $WANDB gemma_evaluation $INSTRUCT > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/piqa_eu.txt" 2>&1 || true
 
 
 echo "All commands executed."

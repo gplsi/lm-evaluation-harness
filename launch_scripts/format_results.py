@@ -409,6 +409,8 @@ def style_results(df,root_folder):
 
 
 main_root_folder = "../results/"
+#main_root_folder = "/home/gplsi/GPLSI/evaluation/lm-evaluation-harness/results"# WITH CONDA
 df = generate_results(main_root_folder)
 results_folder = "../reports/"
+#results_folder = "/home/gplsi/GPLSI/evaluation/lm-evaluation-harness/reports"# WITH CONDA
 style_results(df,results_folder)
