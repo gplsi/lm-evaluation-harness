@@ -83,6 +83,21 @@ docker run --rm \
 ```
 
 
+## Volumes results and reports configuration.
+
+Depending in the type of evaluation that you will perform we recommend to follow this structure in order to map the folder that you are going to save the results.
+
+- **Instruction models**:  
+  *   /home/gplsi/GPLSI/ALIA/modelos/Instruction/reports
+  *   /home/gplsi/GPLSI/ALIA/modelos/Instruction/results
+- **Continual models**: 
+  *   /home/gplsi/GPLSI/ALIA/modelos/Continual/reports
+  *   /home/gplsi/GPLSI/ALIA/modelos/Continual/results
+
+> ⚠️ Depending on the host machine of the code, the *path* will change. Checkout the existance of the volume before running it.
+
+
+By setting up this folder structure all our evaluations will be saved at the same directory and the reports generated will look into previous evalution in order to generate the report.
 
 ## How it works
 This container runs a series of tasks corresponding to the spanish bench defined in ['./launch_scripts/execAllScripts.sh]'. The results of the current evaluation are stored in a mounted foulder in the root folder named `./results`.
