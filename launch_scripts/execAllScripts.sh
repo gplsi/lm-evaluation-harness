@@ -27,8 +27,12 @@ OUTPUT_SUBFOLDER="${OUTPUT_SUBFOLDER}_${TIMESTAMP}"
 WANDB=$2
 INSTRUCT=$3 # INSTRUCT="True" means that the model is instruccion-tuned and has to be evalutaed with an speciifc flag
 echo $INSTRUCT
+
+# Get current directory
+current_dir=$(pwd)
+
 # Define the main output logs directory
-OUTPUT_MAIN_DIR="/outputLogs"
+OUTPUT_MAIN_DIR="${current_dir}/outputLogs"
 
 # Create the subfolder inside outputLogs if it doesn't exist
 echo "Directory created: $OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"
