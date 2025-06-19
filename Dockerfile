@@ -6,45 +6,29 @@ FROM nvcr.io/nvidia/pytorch:25.01-py3
 ARG USER_ID
 ARG GROUP_ID
 
-COPY . /app
-WORKDIR /app
-
-# Crear el grupo y usuario con los IDs especificados
 RUN groupadd -g $GROUP_ID usergroup && \
-    useradd -m -u $USER_ID -g $GROUP_ID user && \
-    mkdir -p /app && \
-    mkdir -p /app/reports && \
-    mkdir -p /outputLogs 
-    #&& \
-#    chown -R user:usergroup /app && \
-#    chown -R user:usergroup /outputLogs
+    useradd -m -u $USER_ID -g usergroup user
+
+COPY . /app
+
+RUN mkdir -p /app /app/reports /app/models /outputLogs
+
+RUN chgrp -R usergroup /app /app/reports /app/models /outputLogs && \
+chmod -R 770 /app /app/reports /app/models /outputLogs && \
+chmod g+s /app /app/reports /app/models /outputLogs
 
 
-# RUN apt-get update --allow-insecure-repositories && \
-#     apt-get install -y --allow-unauthenticated git curl wget build-essential unzip && \
-#     rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+# INSTALL PACKAGES
+RUN pip install -e . && \
+pip uninstall pydantic -y && \
+pip install --no-cache-dir pydantic wandb sentencepiece openpyxl && \
+apt-get install --reinstall -y ca-certificates
 
-
-# Copy application code to container
 COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
-RUN chmod 777 /app/launch_scripts/entrypoint.sh
-RUN chmod 777 -R  /app/reports
-RUN chmod 777 -R /outputLogs
-#RUN mkdir -p /app/reports
-#RUN mkdir -p /outputLogs
+RUN chmod +x -R /app/launch_scripts
 
-
-
-RUN pip install -e .
-RUN pip uninstall pydantic -y
-RUN pip install --no-cache-dir pydantic
-RUN pip install wandb
-RUN pip install sentencepiece
-RUN pip install openpyxl
-RUN apt-get install --reinstall ca-certificates
+USER user
 WORKDIR /app/launch_scripts
-
-#USER user
-
 CMD ["/bin/bash", "entrypoint.sh"]
 #CMD ["/bin/bash"]

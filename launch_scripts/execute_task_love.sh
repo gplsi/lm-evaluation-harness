@@ -113,7 +113,7 @@ else
             --batch_size 1 \
             --output_path $output_dir \
             --log_samples \
-            --seed 1234 
+            --seed 1234 \
             --wandb_args project=$wandb,entity=gplsi_continual
         fi
     fi

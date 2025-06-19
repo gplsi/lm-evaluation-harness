@@ -17,6 +17,8 @@ kill_all_torch() {
         echo "✅ Done."
     fi
 }
+# Set the umask to allow group write permissions
+umask 007
 
 # Assign the arguments to variables
 MODEL_ROUTE=$1
