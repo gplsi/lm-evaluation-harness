@@ -4,8 +4,8 @@
 #SBATCH --error=%j.err          # Nombre del archivo de error
 #SBATCH --cpus-per-task=16             # Número de CPUs por tarea
 #SBATCH --mem=32G                      # Memoria por nodo
-#SBATCH --partition=postiguet1          # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:1
+#SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
+#SBATCH --gres=gpu:3
 
 
 # Cargar variables de entorno desde el archivo .env
@@ -38,7 +38,7 @@ docker build --network=host --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
   --gpus all  \
-  --network host \
+  --network=host \
   --env CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES}" \
   --env NVIDIA_DRIVER_CAPABILITIES=compute,utility \
   --env WANDB_API_KEY="${WANDB_API_KEY}" \
@@ -48,12 +48,13 @@ docker run --rm \
   --env USER_ID="${USER_ID}" \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
-  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/app/results \
-  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/app/reports \
   --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/Aitana_2B_S_v2/hf_models:/models \
   --volume ./outputLogs:/outputLogs \
   --name gplsi_lm-evaluation-harness \
   lm-evaluation-harness
+  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/app/results \
+  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/app/reports \
+  
 
 
 

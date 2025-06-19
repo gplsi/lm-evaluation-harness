@@ -410,9 +410,8 @@ def style_results(df,root_folder):
 
 
 
-
-
 if __name__ == "__main__":
+    os.umask(0o007)
     argparser = argparse.ArgumentParser(description="Generar y estilizar resultados de evaluación de modelos.")
     argparser.add_argument('--evaluation_folder', type=str, default="../results/",
                            help="Ruta al directorio principal donde se encuentran los resultados.")
@@ -442,3 +441,4 @@ if __name__ == "__main__":
     results_folder = args.evaluation_folder + "/reports/"
     os.mkdir(results_folder) if not os.path.exists(results_folder) else None
     style_results(df,results_folder)
+

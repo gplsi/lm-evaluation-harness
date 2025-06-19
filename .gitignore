@@ -26,6 +26,7 @@ wandb
 examples/wandb
 .env
 outputLogs
+outputLogs_1
 results
 results_bad
 testhm
