@@ -22,7 +22,9 @@ else
 fi
 
 # output_dir=results/$(basename ${model})/results:$(basename ${model}):${dataset}:${few_shot}-shot_${job_id}.json
-output_dir=results/$(basename ${model})/results:$(basename ${model}):${execution_name}:${few_shot}-shot_${job_id}
+# output_dir=results/$(basename ${model})/results:$(basename ${model}):${execution_name}:${few_shot}-shot_${job_id}
+
+output_dir=$EVALUATION_FOLDER/results/$(basename ${model})/results:$(basename ${model}):${execution_name}:${few_shot}-shot_${job_id}
 
 cuda_device_count=$(python -c "import torch; print(torch.cuda.device_count())")
 echo "Available GPUs: $cuda_device_count"

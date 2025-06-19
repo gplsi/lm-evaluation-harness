@@ -3,6 +3,8 @@ import json
 import pandas as pd
 import re
 from datetime import datetime
+import argparse
+import shutil
 
 N=1 # CONSTANTE PARA RESALTAR VALORES
 
@@ -408,10 +410,35 @@ def style_results(df,root_folder):
 
 
 
-main_root_folder = "../results/"
-os.umask(0o007)
-#main_root_folder = "/home/gplsi/GPLSI/evaluation/lm-evaluation-harness/results"# WITH CONDA
-df = generate_results(main_root_folder)
-results_folder = "../reports/"
-#results_folder = "/home/gplsi/GPLSI/evaluation/lm-evaluation-harness/reports"# WITH CONDA
-style_results(df,results_folder)
+if __name__ == "__main__":
+    os.umask(0o007)
+    argparser = argparse.ArgumentParser(description="Generar y estilizar resultados de evaluación de modelos.")
+    argparser.add_argument('--evaluation_folder', type=str, default="../results/",
+                           help="Ruta al directorio principal donde se encuentran los resultados.")
+    argparser.add_argument('--evaluation_folder_gold', type=str, default="../results/",
+                           help="Ruta al directorio principal donde se encuentran los mejores resultados.")
+    args = argparser.parse_args()
+    
+    main_root_folder = args.evaluation_folder + "/results/"
+    
+    main_root_folder_gold = args.evaluation_folder_gold + "/results/"
+    
+    if os.path.exists(main_root_folder_gold):
+        temp_folder = args.evaluation_folder + "/temp/"
+        # os.mkdir(temp_folder) if not os.path.exists(temp_folder) else None
+        shutil.copytree(main_root_folder_gold, temp_folder, dirs_exist_ok=True)
+        shutil.copytree(main_root_folder, temp_folder, dirs_exist_ok=True)
+        main_root_folder = temp_folder
+    else:
+        
+        print(f"❌ No se encontró la carpeta de resultados: {main_root_folder_gold}")
+        exit(1)
+    
+    df = generate_results(main_root_folder)
+    if "temp" in main_root_folder:
+        shutil.rmtree(main_root_folder)
+    
+    results_folder = args.evaluation_folder + "/reports/"
+    os.mkdir(results_folder) if not os.path.exists(results_folder) else None
+    style_results(df,results_folder)
+

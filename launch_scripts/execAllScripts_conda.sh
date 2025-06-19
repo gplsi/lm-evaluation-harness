@@ -28,8 +28,8 @@ WANDB=$2
 INSTRUCT=$3 # INSTRUCT="True" means that the model is instruccion-tuned and has to be evalutaed with an speciifc flag
 echo $INSTRUCT
 # Define the main output logs directory
-OUTPUT_MAIN_DIR="/home/gplsi/GPLSI/evaluation/lm-evaluation-harness/outputLogs_1"
-echo "Output directory: /home/gplsi/GPLSI/evaluation/lm-evaluation-harness/outputLogs_1"
+OUTPUT_MAIN_DIR="/home/gplsi/GPLSI/codigos/lm-evaluation-harness/outputLogs"
+echo "Output directory: $OUTPUT_MAIN_DIR"
 
 # Create the subfolder inside outputLogs if it doesn't exist
 echo "Directory created: $OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"
