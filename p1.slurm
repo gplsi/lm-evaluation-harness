@@ -4,8 +4,8 @@
 #SBATCH --error=%j.err          # Nombre del archivo de error
 #SBATCH --cpus-per-task=16             # Número de CPUs por tarea
 #SBATCH --mem=32G                      # Memoria por nodo
-#SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:3
+#SBATCH --partition=postiguet1          # Cola (partición) a la que enviar el trabajo
+#SBATCH --gres=gpu:1
 
 
 # Cargar variables de entorno desde el archivo .env
@@ -49,11 +49,11 @@ docker run --rm \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
   --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/Aitana_2B_S_v2/hf_models:/models \
-  --volume ./outputLogs:/outputLogs \
+  --volume ./outputLogs:/home/user/app/outputLogs/ \
   --name gplsi_lm-evaluation-harness \
   lm-evaluation-harness
-  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/app/results \
-  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/app/reports \
+  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/home/user/app/results \
+  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/home/user/app/reports \
   
 
 

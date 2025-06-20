@@ -9,26 +9,37 @@ ARG GROUP_ID
 RUN groupadd -g $GROUP_ID usergroup && \
     useradd -m -u $USER_ID -g usergroup user
 
-COPY . /app
+COPY . /home/user/app
 
-RUN mkdir -p /app /app/reports /app/models /outputLogs
-
-RUN chgrp -R usergroup /app /app/reports /app/models /outputLogs && \
-chmod -R 770 /app /app/reports /app/models /outputLogs && \
-chmod g+s /app /app/reports /app/models /outputLogs
+RUN mkdir -p /home/user/app /home/user/app/reports /models /home/user/app/outputLogs 
 
 
-WORKDIR /app
+
+RUN chgrp -R usergroup /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
+chmod -R 770 /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
+chmod g+s /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
+chown -R user:usergroup /home/user/app && chmod -R 770 /home/user/app && \
+chown -R user:usergroup /models && chmod -R 770 /models
+
+
+
+
+WORKDIR /home/user/app
 # INSTALL PACKAGES
 RUN pip install -e . && \
 pip uninstall pydantic -y && \
 pip install --no-cache-dir pydantic wandb sentencepiece openpyxl && \
 apt-get install --reinstall -y ca-certificates
 
-COPY entrypoint.sh /app/launch_scripts/entrypoint.sh
-RUN chmod +x -R /app/launch_scripts
 
+#COPY entrypoint.sh /home/user/app/launch_scripts/entrypoint.sh
+#RUN chmod +x -R /home/user/app/launch_scripts
+
+#COPY entrypoint.sh /home/user/app/entrypoint.sh
+RUN chmod +x /home/user/app/entrypoint.sh
+RUN chmod +x -R /home/user/app/launch_scripts
+#RUN chmod +x -R /home/user/app
 USER user
-WORKDIR /app/launch_scripts
-CMD ["/bin/bash", "entrypoint.sh"]
+#WORKDIR /home/user/app/launch_scripts
+CMD ["/bin/bash", "./entrypoint.sh"]
 #CMD ["/bin/bash"]
