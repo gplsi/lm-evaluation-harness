@@ -1,4 +1,4 @@
-import osAdd commentMore actions
+import os
 import json
 import pandas as pd
 import re
@@ -410,8 +410,9 @@ def style_results(df,root_folder):
 
 
 
+
+
 if __name__ == "__main__":
-    os.umask(0o007)
     argparser = argparse.ArgumentParser(description="Generar y estilizar resultados de evaluación de modelos.")
     argparser.add_argument('--evaluation_folder', type=str, default="../results/",
                            help="Ruta al directorio principal donde se encuentran los resultados.")
