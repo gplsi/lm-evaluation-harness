@@ -11,13 +11,13 @@ RUN groupadd -g $GROUP_ID usergroup && \
 
 COPY . /home/user/app
 
-RUN mkdir -p /home/user/app /home/user/app/reports /models /home/user/app/outputLogs 
+RUN mkdir -p /home/user/app /home/user/app/results /home/user/app/reports /models /home/user/app/outputLogs 
 
 
 
-RUN chgrp -R usergroup /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
-chmod -R 770 /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
-chmod g+s /home/user/app /home/user/app/reports /models /home/user/app/outputLogs && \
+RUN chgrp -R usergroup /home/user/app /home/user/app/results /home/user/app/reports /models /home/user/app/outputLogs && \
+chmod -R 770 /home/user/app /home/user/app/results /home/user/app/reports /models /home/user/app/outputLogs && \
+chmod g+s /home/user/app /home/user/app/results /home/user/app/reports /models /home/user/app/outputLogs && \
 chown -R user:usergroup /home/user/app && chmod -R 770 /home/user/app && \
 chown -R user:usergroup /models && chmod -R 770 /models
 

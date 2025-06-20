@@ -4,6 +4,8 @@
 #PARSE STRING MODELS
 IFS=',' read -r -a arr_models <<< $MODELS_TO_EVALUATE
 
+umask 007
+
 #Loop in order to evaluate a list of models
 for model in "${arr_models[@]}"; do
     echo "Evaluating $model"
