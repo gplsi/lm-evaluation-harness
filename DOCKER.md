@@ -26,45 +26,34 @@ git clone https://github.com/gplsi/lm-evaluation-harness.git
 2. Create the `.env` in which different configurations(*model-name*,*model-path*,*wandb-configuration*) will be set.
 ```.env
 WANDB_API_KEY=<<WANDB api key>>
-MODELS_TO_EVALUATE=<<Model name/Model Path>>
-HF_TOKEN==<<Hugging face api to access model that requires special permission to execute>>
+WANDB_PROJECT=<<WANDB project name>>
+MODELS_TO_EVALUATE=<<Model name/List of models names>>
+HF_TOKEN==<<Hugging face api to access model that requires special permission to execute/download>>
 INSTRUCT_EVALUATION=True #In case you have to evaluate instruction models.
-WANDB_PROJECT=<<Project name>>
 USER_ID=$(id -u)
 GROUP_ID=$(id -g)
+EVALUATION_FOLDER=<<PATH to folder where the results will be stored and reports be generated>>
+EVALUATION_FOLDER_GOLD=<<PATH to folder with gold evaluation for the evaluation with other models>>
+MODELS_FOLDER=<<PATH to folder where the models in format HF are stored>>
+
 ```
 > In order to evaluate multiple models you can define a list of models separated by commas with no spaces.
 Example: `MODELS_TO_EVALUATE=/models/salamandra-2b/iter-167999-ckpt.pth,BSC-LT/salamandraTA-2B,deepseek-ai/DeepSeek-R1`
 
-3. Configure the volumes that you will map to store the *logs*/*results*/*reports* of the container in [docker-compose.yml](./docker-compose.yml).
+3. Build the image.
 
-> In our [docker-compose.yml](./docker-compose.yml) we define a folder named **outputLogs** at the same directory level in which the repo was cloned.
-
-> In addition, in case that you want to use a downloaded model in `/home/NAS/GPLSI` directory, we suggest to use the same directory inside the volume to avoid confusion.
-
-4. Build the image.
-```bash
-docker build --network=host \
-  --build-arg USER_ID=$(id -u) \
-  --build-arg GROUP_ID=$(id -g) \
-  -t lm-evaluation-harness .
-```
+  ```bash
+  docker build --network=host \
+    --build-arg USER_ID=$(id -u) \
+    --build-arg GROUP_ID=$(id -g) \
+    -t lm-evaluation-harness .
+  ```
 
 5. Execute the container.
 ```bash
-docker compose up
-```
-
->> In case you want to use all the GPUs in the host machine you must set in the [docker-compose.yml](./docker-compose.yml) the **device_ids** to `"all"` in other case you have to introduce manually the device_ids.
-
-
-The best option is to run the container by using *docker run* command.
-
-
-```bash
 docker run --rm \
   --gpus all  \
-  --network host \
+  --network=host \
   --env CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES}" \
   --env NVIDIA_DRIVER_CAPABILITIES=compute,utility \
   --env WANDB_API_KEY="${WANDB_API_KEY}" \
@@ -74,39 +63,38 @@ docker run --rm \
   --env USER_ID="${USER_ID}" \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
-  --volume <<results_path_in_your_machine>>:/app/results \
-  --volume <<reports_path_in_your_machine>>:/app/reports \
-  --volume <<models_path_in_your_machine>>:/models \
-  --volume <<logs_path_in_your_machine>>:/outputLogs \
+  --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
+  --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
+  --volume $MODELS_FOLDER:/models \
+  --volume $EVALUATION_FOLDER:/home/user/app/evaluaciones \
+  --volume $EVALUATION_FOLDER_GOLD:/home/user/app/evaluaciones_gold \
+  --volume ./outputLogs:/home/user/app/outputLogs/ \
   --name gplsi_lm-evaluation-harness \
   lm-evaluation-harness
 ```
 
 
+
+
 ## Volumes results and reports configuration.
 
-Depending in the type of evaluation that you will perform we recommend to follow this structure in order to map the folder that you are going to save the results.
+Depending in the type of evaluation that you will perform we recommend to store the results in the same root directory where the models are stored.
 
-- **Instruction models**:  
-  *   /home/gplsi/GPLSI/ALIA/modelos/Instruction/reports
-  *   /home/gplsi/GPLSI/ALIA/modelos/Instruction/results
-- **Continual models**: 
-  *   /home/gplsi/GPLSI/ALIA/modelos/Continual/reports
-  *   /home/gplsi/GPLSI/ALIA/modelos/Continual/results
+Example:
+* The `$MODEL_PATH` is defined in the path `/home/modelos/hf_models/`.
+* The `$EVALUATION_FOLDER` should be defined in `/home/modelos/evaluaciones/`.
 
-> ⚠️ Depending on the host machine of the code, the *path* will change. Checkout the existance of the volume before running it.
+> ⚠️ Before launching the code in cue, you must check the paths in the .env because depending on the machine it could change.
 
-
-By setting up this folder structure all our evaluations will be saved at the same directory and the reports generated will look into previous evalution in order to generate the report.
 
 ## How it works
-This container runs a series of tasks corresponding to the spanish bench defined in ['./launch_scripts/execAllScripts.sh]'. The results of the current evaluation are stored in a mounted foulder in the root folder named `./results`.
+This container runs a series of tasks corresponding to the spanish bench defined in ['./launch_scripts/execAllScripts.sh]'. The results of the current evaluation are stored in a mounted folders defined in the **enviorment variable** `$EVALUATION_FOLDER` and `$EVALUATION_FOLDER_GOLD`.
 
-In addition, there is a mounted folder named `./outputLogs` where the logs of the different evaluation processes will be stored.
+In addition, there is a mounted folder named `./outputLogs` at the level of the repository where the logs of the different evaluation processes will be stored.
 
 In order to modify the tasks that you want to evaluate the models on, you can modify the [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh) which is used as **entrypoint** of the docker container.
 
-After the end of the evaluation a XLSX with the results cleaned will be stored at `./reports` folder, this CSV is generated using [./launch_scripts/format_results.py] that processes all the evaluation results that are stored in  `./results` folder.
+After the end of the evaluation a XLSX with the results cleaned will be stored at `$EVALUATION_FOLDER/reports` folder, this CSV is generated using [./launch_scripts/format_results.py] that processes all the evaluation results that are stored in  `$EVALUATION_FOLDER/results` folder.
 
 >> In case that you want to execute specific tasks we recommend to create a new *script* in [./launch_scripts](./launch_scripts/) directory and modify [./entrypoint.sh](./entrypoint.sh) to call the custom script instead of [./launch_scripts/execAllScripts.sh](./launch_scripts/execAllScripts.sh).
 

@@ -13,7 +13,7 @@ set -a
 source .env
 set +a
 
-
+umask 007
 # Aquí empieza la sección de comandos que se van a ejecutar
 
 echo "Iniciando trabajo en `hostname` a las `date` $SLURM_IDX"
@@ -48,7 +48,11 @@ docker run --rm \
   --env USER_ID="${USER_ID}" \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
-  --volume /home/gplsi/GPLSI/ALIA/modelos/Continual/Aitana_2B_S_v2/hf_models:/models \
+  --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
+  --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
+  --volume $MODELS_FOLDER:/models \
+  --volume $EVALUATION_FOLDER:/home/user/app/evaluaciones \
+  --volume $EVALUATION_FOLDER_GOLD:/home/user/app/evaluaciones_gold \
   --volume ./outputLogs:/home/user/app/outputLogs/ \
   --name gplsi_lm-evaluation-harness \
   lm-evaluation-harness

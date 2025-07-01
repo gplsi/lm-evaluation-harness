@@ -396,6 +396,8 @@ def style_results(df,root_folder):
 
     #df = df[~df.language.isin(exclude_language)].reset_index(drop=True)
     df.drop(columns=['output_type','Random','language'], inplace=True)
+    # Eliminar métricas que contienen '_norm'
+    df = df[df['metric'].apply(lambda x: '_norm' not in x )].reset_index(drop=True)
     df = df.set_index(['task', 'metric'])
     #df.sort_index(level='language',inplace=True)
 
