@@ -383,6 +383,50 @@ def highlight_nsmallest_nlargest(s, n=N):
             'background-color: lightcoral' if w else 
             '' for v, w in zip(is_min, is_max)]
 
+
+#### ----------------------------------------------------------------------------#
+# Función auxiliar para normalizar los scores de los modelos por idioma.
+#### -----------------------------------------------------------------------------
+def normalized_value(row, column):
+
+    raw_metric = row[column] if row['metric'] in ['bleu', 'chrf', 'mcc', 'exact_match'] else row[column]*100
+    #raw_metric = row[column]
+    random_score = row['random']
+    max_score = row['Max']
+    return (raw_metric - random_score) / (max_score - random_score)
+
+#### -----------------------------------------------------------------------------
+# Función para normalizar los scores de los modelos por idioma.
+def normalize_models_score_by_language(df):
+    # Cargar el diccionario de normalización
+    normalized_dict = '/home/user/app/launch_scripts/language_task_map.xlsx'
+    df_normalized_dict = pd.read_excel(normalized_dict)
+    df_normalized_dict.sort_values(by="task", inplace=True)
+
+    df_copy = df.copy()
+    df_copy.dropna(subset=['task'], inplace=True)
+    df_copy.sort_values(by=['task'], inplace=True)
+
+    df_copy = pd.merge(df_normalized_dict, df_copy,  on=['task', 'metric'])
+    subset_columns = df_copy.columns[6:]
+    
+    for column in subset_columns:
+        df_copy[column] = df_copy.apply(lambda row: normalized_value(row, column), axis=1)
+
+    df_gropup = df_copy.groupby(['task','language'], as_index=False)[subset_columns].mean()
+    subset_columns = ['language'] + list(df_gropup.columns[2:])
+
+    df_subset = df_gropup[subset_columns]
+
+    # Cálculo de la media aritmetica por idioma
+    df_mean = df_subset.groupby('language').mean().reset_index()
+    df_mean.set_index('language', inplace=True)
+    df_mean = df_mean.T
+    df_mean.sort_values(by=['Valencian','Catalan','Spanish', 'English'], inplace=True, ascending=False)
+    df_mean = df_mean.style.apply(highlight_nsmallest_nlargest, axis=0)
+    return df_mean
+
+
 #### -----------------------------------------------------------------------------
 # Aplicar estilos a los resultados para visualizar mejor los datos.
 #### -----------------------------------------------------------------------------
@@ -398,6 +442,7 @@ def style_results(df,root_folder):
     df.drop(columns=['output_type','Random','language'], inplace=True)
     # Eliminar métricas que contienen '_norm'
     df = df[df['metric'].apply(lambda x: '_norm' not in x )].reset_index(drop=True)
+    df_norm = normalize_models_score_by_language(df)
     df = df.set_index(['task', 'metric'])
     #df.sort_index(level='language',inplace=True)
 
@@ -407,7 +452,9 @@ def style_results(df,root_folder):
     name = "Resultados_unidos_"
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") 
     file_name = name+now
-    df.to_excel(root_folder+file_name+'.xlsx', engine='openpyxl', index=True, header=True)
+    with pd.ExcelWriter(root_folder+file_name+'.xlsx', engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Resultados', index=True, header=True)
+        df_norm.to_excel(writer, sheet_name='Normalizados', index=True, header=True)
     print(f"\n✅ Archivos guardado como {root_folder+file_name}.xlsx")
 
 
