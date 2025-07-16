@@ -1,6 +1,6 @@
 
 #FROM nvcr.io/nvidia/pytorch:24.02-py3
-FROM nvcr.io/nvidia/pytorch:25.01-py3
+FROM nvcr.io/nvidia/pytorch:25.05-py3
 
 # Argumentos para UID y GID
 ARG USER_ID
@@ -30,7 +30,6 @@ RUN pip install -e . && \
 pip uninstall pydantic -y && \
 pip install --no-cache-dir pydantic wandb sentencepiece openpyxl && \
 apt-get install --reinstall -y ca-certificates
-
 
 #COPY entrypoint.sh /home/user/app/launch_scripts/entrypoint.sh
 #RUN chmod +x -R /home/user/app/launch_scripts
