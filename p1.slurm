@@ -2,12 +2,11 @@
 #SBATCH --job-name=llm_evaluation_harness          # Nombre del trabajo
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
-#SBATCH --cpus-per-task=16             # Número de CPUs por tarea
-#SBATCH --mem=32G                      # Memoria por nodo
-#SBATCH --partition=postiguet1          # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:1
-
-
+#SBATCH --cpus-per-task=32             # Número de CPUs por tarea
+#SBATCH --mem=64G                      # Memoria por nodo
+#SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
+#SBATCH --gres=gpu:3
+#SBATCH --nodelist=allen.iuii.ua.es
 # Cargar variables de entorno desde el archivo .env
 set -a
 source .env
@@ -24,17 +23,20 @@ nvidia-smi
 R=`pwd`
 # Ejecuta tu programa aquí (reemplaza esto con lo que desees ejecutar)
 # Ejecutar el contenedor con acceso a la GPU
-echo "Checking if the container still active."
-docker stop gplsi_lm-evaluation-harness
-
-docker rm gplsi_lm-evaluation-harness
-
+#echo "Checking if the container still active."
+#docker stop gplsi_lm-evaluation-harness_1
+##
+#docker rm gplsi_lm-evaluation-harness_1
+#docker rmi lm-evaluation-harness
+mkdir -p $EVALUATION_FOLDER
+mkdir -p $EVALUATION_FOLDER_GOLD
 
 echo "Building lm-evaluation-harness Docker image..."
-
+echo "USER ID: $USER_ID"
+echo "GROUP ID: $GROUP_ID"
 
 docker ps
-docker build --network=host --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) -t lm-evaluation-harness .
+docker build --network=host --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -t lm-evaluation-harness .
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
   --gpus all  \
@@ -54,8 +56,9 @@ docker run --rm \
   --volume $EVALUATION_FOLDER:/home/user/app/evaluaciones \
   --volume $EVALUATION_FOLDER_GOLD:/home/user/app/evaluaciones_gold \
   --volume ./outputLogs:/home/user/app/outputLogs/ \
-  --name gplsi_lm-evaluation-harness \
-  lm-evaluation-harness
+  lm-evaluation-harness 
+  #--name gplsi_lm-evaluation-harness \
+  #lm-evaluation-harness
   #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/home/user/app/results \
   #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/home/user/app/reports \
   

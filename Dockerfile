@@ -11,14 +11,17 @@ RUN groupadd -g $GROUP_ID usergroup && \
 
 COPY . /home/user/app
 
-RUN mkdir -p /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results/home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs 
+RUN mkdir -p /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs 
 
 
 
-RUN chgrp -R usergroup /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results/home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
-chmod -R 770 /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results/home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
-chmod g+s /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results/home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
+RUN chgrp -R usergroup /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
+chmod -R 770 /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
+chmod g+s /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
 chown -R user:usergroup /home/user/app && chmod -R 770 /home/user/app && \
+chown -R user:usergroup /home/user/app/evaluaciones && chmod -R 770 /home/user/app/evaluaciones && \
+chown -R user:usergroup /home/user/app/evaluaciones/reports && chmod -R 770 /home/user/app/evaluaciones/reports && \
+chown -R user:usergroup /home/user/app/evaluaciones/results && chmod -R 770 /home/user/app/evaluaciones/results && \
 chown -R user:usergroup /models && chmod -R 770 /models
 
 
@@ -30,6 +33,8 @@ RUN pip install -e . && \
 pip uninstall pydantic -y && \
 pip install --no-cache-dir pydantic wandb sentencepiece openpyxl && \
 apt-get install --reinstall -y ca-certificates
+
+RUN pip install datasets==3.6.0
 
 #COPY entrypoint.sh /home/user/app/launch_scripts/entrypoint.sh
 #RUN chmod +x -R /home/user/app/launch_scripts
