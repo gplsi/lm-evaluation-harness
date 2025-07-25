@@ -1,16 +1,19 @@
 #!/bin/bash
-#SBATCH --job-name=llm_evaluation_harness          # Nombre del trabajo
+#SBATCH --job-name=v7_llm_evaluation_harness          # Nombre del trabajo
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
 #SBATCH --cpus-per-task=32             # Número de CPUs por tarea
 #SBATCH --mem=64G                      # Memoria por nodo
 #SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
-#SBATCH --gres=gpu:3
-#SBATCH --nodelist=allen.iuii.ua.es
+#SBATCH --gres=gpu:2
 # Cargar variables de entorno desde el archivo .env
 set -a
-source .env
+source .env_v7
 set +a
+
+
+CPUSET=$(taskset -cp $$ | awk -F: '{print $2}' | tr -d ' ') #Número de gpus a usar
+echo "SLURM-assigned CPU cores: $CPUSET"
 
 umask 007
 # Aquí empieza la sección de comandos que se van a ejecutar
@@ -39,6 +42,8 @@ docker ps
 docker build --network=host --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -t lm-evaluation-harness .
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
+  --cpuset-cpus="$CPUSET" \
+  --ipc=host \
   --gpus all  \
   --network=host \
   --env CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES}" \
@@ -50,6 +55,7 @@ docker run --rm \
   --env USER_ID="${USER_ID}" \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
+  --env SHOTS="${SHOTS}" \
   --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
   --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
   --volume $MODELS_FOLDER:/models \

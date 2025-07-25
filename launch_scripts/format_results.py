@@ -407,8 +407,9 @@ def normalized_value(row, column):
 # Función para normalizar los scores de los modelos por idioma.
 def normalize_models_score_by_language(df):
     # Cargar el diccionario de normalización
-    normalized_dict = '/home/gplsi/GPLSI/codigos/lm-evaluation-harness/launch_scripts/language_task_map.xlsx'
-    #normalized_dict = '/home/user/app/launch_scripts/language_task_map.xlsx'
+    #normalized_dict = '/home/gplsi/GPLSI/codigos/lm-evaluation-harness/launch_scripts/language_task_map.xlsx'
+    normalized_dict = '/home/user/app/launch_scripts/language_task_map.xlsx'
+    #normalized_dict = './language_task_map.xlsx'
     df_normalized_dict = pd.read_excel(normalized_dict)
     df_normalized_dict.sort_values(by="task", inplace=True)
 

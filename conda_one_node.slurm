@@ -3,10 +3,10 @@
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
 #SBATCH --partition=dgx
-#SBATCH --gres=gpu:3
-#SBATCH --mem=128GB
+#SBATCH --gres=gpu:2
+#SBATCH --mem=32GB
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=128
+#SBATCH --cpus-per-task=64
 #SBATCH --time=48:00:00
 
 # Activar entorno
@@ -22,4 +22,4 @@ set +a
 
 huggingface-cli login --token $HF_TOKEN
 
-./entrypoint_conda.sh
+./entrypoint.sh

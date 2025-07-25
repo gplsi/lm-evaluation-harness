@@ -9,6 +9,7 @@ build
 dist
 *.egg-info
 venv
+.env_*
 .venv/
 .vscode/
 temp
