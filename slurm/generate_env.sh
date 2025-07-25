@@ -11,7 +11,8 @@ from pathlib import Path
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Generate environment file from YAML configuration")
     parser.add_argument("--config", type=str, required=True, help="Path to the YAML configuration file")
-    parser.add_argument("--output", type=str, help="Path to output env file (defaults to .env_<unique_id>_<experiment_name>)")
+    parser.add_argument("--env-id", type=str, required=True, help="Identifier for the enviroment file")
+
     return parser.parse_args()
 
 def read_config(config_path):
@@ -23,16 +24,12 @@ def sanitize_filename(name):
     return re.sub(r'[^a-zA-Z0-9_-]', '_', name)
 
 
-def generate_env_file(config, output_path=None):
-    # Generate unique identifier
-    unique_id = str(uuid.uuid4())[:8]
+def generate_env_file(config, env_id):
+
     
     # Use evaluation_name for the experiment name
     experiment_name = sanitize_filename(config['evaluation_name'])
     
-    # If output path not specified, create one with unique ID and experiment name
-    if not output_path:
-        output_path = f".env_{unique_id}_{experiment_name}"
     
     # Get user and group ID (needed for docker)
     user_id = os.getuid()
@@ -46,7 +43,7 @@ def generate_env_file(config, output_path=None):
         f"USER_ID={user_id}",
         f"GROUP_ID={group_id}",
         f"MODELS_TO_EVALUATE={models_names}",
-        f"MODELS_FOLDER={config['models']['models_path']}",
+        f"MODELS_FOLDER={config['models'].get('models_path','')}",
         f"EVALUATION_FOLDER={config['evaluation']['evaluation_folder']}",
         f"EVALUATION_FOLDER_GOLD={config['evaluation']['evaluation_folder_gold']}",
         f"WANDB_PROJECT={config['wandb_project']}",
@@ -58,19 +55,20 @@ def generate_env_file(config, output_path=None):
     ]
     
     # Write the env file
-    env_file = Path(output_path)
+    env_file = Path('./'+ f".env_{env_id}")
     env_file.write_text("\n".join(env_content))
+    print(f"Environment file created: {env_file}")
     
     return env_file
 
 def check_model_configuration(config):
     """Check if the model configuration is valid"""
-    required_fields = ['local', 'models_names', 'models_path']
+    required_fields = ['local', 'models_names'] if config['models']['local'] == False else ['local', 'models_names','models_path']
 
     for field in required_fields:
         if field not in config['models']:
             raise ValueError(f"Missing required field in models configuration: {field}")
-
+    print(config['models']['local'])
     if config['models']['local'] == False:
         print("Using models from Hugging Face")
         pass
@@ -110,6 +108,15 @@ def check_languages_configuration(config):
     
     supported_languages = ['Spanish', 'English', 'Valencian', 'Catalan']
     
+    dict_languages = {
+        'Spanish': 'es',
+        'English': 'en',
+        'Valencian': 'va',
+        'Catalan': 'ca'
+    }
+
+    count_languages_to_evaluate = 0
+    languages_text_to_evaluate = ""
     for lang_obj in config['languages']:
         if not isinstance(lang_obj, dict):
             raise ValueError("Each language entry must be a dictionary")
@@ -120,6 +127,18 @@ def check_languages_configuration(config):
             
             if not isinstance(enabled, bool):
                 raise ValueError(f"Language '{lang_name}' value must be a boolean (true/false)")
+            
+            else:
+                if enabled:
+                    if count_languages_to_evaluate == 0:
+                        languages_text_to_evaluate += dict_languages[lang_name]
+                    else:
+                        languages_text_to_evaluate += "," + dict_languages[lang_name]
+                    count_languages_to_evaluate += 1
+                    
+    config['languages'] = languages_text_to_evaluate
+
+
         
 def check_config(config):
     """Check if the config has all required fields"""
@@ -141,11 +160,12 @@ def check_config(config):
 def main():
     args = parse_arguments()
     config = read_config(args.config)
+    env_id = args.env_id
     check_config(config)
     print(f"Generating environment file for: {config['evaluation_name']}")
     
     # Generate environment file from config
-    env_file = generate_env_file(config, args.output)
+    env_file = generate_env_file(config, env_id)
     
     print(f"Environment file created: {env_file}")
     print(f"You can now run: bash launch_job.sh {env_file}")

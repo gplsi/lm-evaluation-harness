@@ -1,32 +1,51 @@
 #!/bin/bash
-# filepath: /home/gplsi/Documentos/ALIA/lm-evaluation-harness/launch_job.sh
 
-# Check if env file was provided
+# Check if config file was provided
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 <env_file>"
-  echo "Example: $0 .env_instruct_evaluation"
+  echo "Usage: $0 <config_file.yaml>"
+  echo "Example: $0 config_experiment.yaml"
   exit 1
 fi
 
-ENV_FILE=$1
+CONFIG_FILE=$1
 
-# Ensure the env file exists
+# Ensure the config file exists
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "Error: Configuration file $CONFIG_FILE not found"
+  exit 1
+fi
+
+# Generate unique ID for this job
+JOB_ID=$(date +%Y%m%d_%H%M%S)_$$  # timestamp + process ID
+# Alternative: JOB_ID=$(uuidgen | cut -d- -f1)  # first part of UUID
+
+echo "Job ID: $JOB_ID"
+
+# Generate environment file using generate_env.sh with custom ID
+echo "Generating environment file from config: $CONFIG_FILE"
+python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID"
+ENV_FILE=".env_$JOB_ID"
 if [ ! -f "$ENV_FILE" ]; then
-  echo "Error: Environment file $ENV_FILE not found"
+  echo "Error: Failed to generate environment file: $ENV_FILE"
   exit 1
 fi
+
+echo "Environment file generated:"
 
 # Create a temporary SLURM script with the correct env file
-TMP_SCRIPT="tmp_slurm_$(basename $ENV_FILE).slurm"
+TMP_SCRIPT="slurm_job_${JOB_ID}.slurm"
 
-# Copy the original SLURM script and replace the env source
-cat p1.slurm | sed "s|source .env_v7|source $ENV_FILE|g" > $TMP_SCRIPT
+# Copy the base contract and replace the env source line
+sed "s|source .env|source $ENV_FILE|g" base_contract.slurm > $TMP_SCRIPT
 
 # Make it executable
 chmod +x $TMP_SCRIPT
 
 # Submit the job
 echo "Submitting job with environment file: $ENV_FILE"
-sbatch $TMP_SCRIPT
+#sbatch $TMP_SCRIPT
 
-echo "Job submitted. Temporary script created: $TMP_SCRIPT"
+echo "Job submitted successfully!"
+echo "Job ID: $JOB_ID"
+echo "SLURM script: $TMP_SCRIPT"
+echo "Environment file: $ENV_FILE"
