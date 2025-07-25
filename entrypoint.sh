@@ -20,7 +20,7 @@ for model in "${arr_models[@]}"; do
     else
         model_dir=$model
     fi
-    echo "./launch_scripts/execAllScripts.sh" $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION
+    echo "./launch_scripts/execAllScripts.sh" $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS
     ./launch_scripts/execAllScripts.sh $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS
 done
 
