@@ -14,7 +14,6 @@ COPY . /home/user/app
 RUN mkdir -p /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs 
 
 
-
 RUN chgrp -R usergroup /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
 chmod -R 770 /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \
 chmod g+s /home/user/app /home/user/app/evaluaciones /home/user/app/evaluaciones/reports /home/user/app/evaluaciones/results /home/user/app/evaluaciones_gold /home/user/app/evaluaciones_gold/reports /home/user/app/evaluaciones_gold/results /models /home/user/app/outputLogs && \

@@ -34,3 +34,5 @@ testhm
 reports
 *.err
 *.out
+slurm/experiments/
+slurm/slurm

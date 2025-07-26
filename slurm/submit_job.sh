@@ -30,22 +30,31 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-echo "Environment file generated:"
+echo "Environment file generated."
+echo "Expermient: $JOB_ID"
+mkdir -m 770 -p ./experiments/$JOB_ID
+mkdir -m 770 -p ./experiments/$JOB_ID/outputLogs
+mv ./$ENV_FILE ./experiments/$JOB_ID
 
 # Create a temporary SLURM script with the correct env file
 TMP_SCRIPT="slurm_job_${JOB_ID}.slurm"
 
 # Copy the base contract and replace the env source line
-sed "s|source .env|source $ENV_FILE|g" base_contract.slurm > $TMP_SCRIPT
+sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
+    -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
+    -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
+    -e "s|--volume ../outputLogs:/home/user/app/outputLogs/|--volume ./experiments/$JOB_ID/outputLogs:/home/user/app/outputLogs/|g" \
+    base_contract.slurm > $TMP_SCRIPT
+
 
 # Make it executable
 chmod +x $TMP_SCRIPT
+mv ./$TMP_SCRIPT ./experiments/$JOB_ID
 
-# Submit the job
-echo "Submitting job with environment file: $ENV_FILE"
-#sbatch $TMP_SCRIPT
 
-echo "Job submitted successfully!"
-echo "Job ID: $JOB_ID"
-echo "SLURM script: $TMP_SCRIPT"
-echo "Environment file: $ENV_FILE"
+echo "SLURM script: ./experiments/$JOB_ID/$TMP_SCRIPT"
+echo "Environment file: ./experiments/$JOB_ID/$ENV_FILE"
+
+# Submitting the 
+echo "##################################"
+sbatch ./experiments/$JOB_ID/$TMP_SCRIPT

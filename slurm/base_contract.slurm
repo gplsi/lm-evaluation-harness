@@ -39,7 +39,13 @@ echo "USER ID: $USER_ID"
 echo "GROUP ID: $GROUP_ID"
 
 docker ps
-docker build --network=host --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -t lm-evaluation-harness:latest .
+docker build \
+  --network=host \
+  --build-arg USER_ID=$USER_ID \
+  --build-arg GROUP_ID=$GROUP_ID \
+  -f ../Dockerfile \
+  -t lm-evaluation-harness:latest \
+  ..
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
   --cpuset-cpus="$CPUSET" \
@@ -58,10 +64,11 @@ docker run --rm \
   --env SHOTS="${SHOTS}" \
   --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
   --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
+  --env LANGUAGES="${LANGUAGES}" \
   --volume $MODELS_FOLDER:/models \
   --volume $EVALUATION_FOLDER:/home/user/app/evaluaciones \
   --volume $EVALUATION_FOLDER_GOLD:/home/user/app/evaluaciones_gold \
-  --volume ./outputLogs:/home/user/app/outputLogs/ \
+  --volume ../outputLogs:/home/user/app/outputLogs/ \
   lm-evaluation-harness:latest 
   
 

@@ -28,20 +28,13 @@ def generate_env_file(config, env_id):
 
     
     # Use evaluation_name for the experiment name
-    experiment_name = sanitize_filename(config['evaluation_name'])
-    
-    
-    # Get user and group ID (needed for docker)
-    user_id = os.getuid()
-    group_id = os.getgid()
-    
+    experiment_name = sanitize_filename(config['evaluation_name']) 
     # Parse model names
     models_names = config['models']['models_names'].replace(',', ' ')
-    
     # Create the env file content
     env_content = [
-        f"USER_ID={user_id}",
-        f"GROUP_ID={group_id}",
+        f"USER_ID=$(id -u)",
+        f"GROUP_ID=$(id -g)",
         f"MODELS_TO_EVALUATE={models_names}",
         f"MODELS_FOLDER={config['models'].get('models_path','')}",
         f"EVALUATION_FOLDER={config['evaluation']['evaluation_folder']}",
@@ -51,7 +44,8 @@ def generate_env_file(config, env_id):
         f"SHOTS={config['evaluation']['shots']}",
         # Read sensitive tokens from environment if available
         f"WANDB_API_KEY={os.environ.get('WANDB_API_KEY', '')}",
-        f"HF_TOKEN={os.environ.get('HF_TOKEN', '')}"
+        f"HF_TOKEN={os.environ.get('HF_TOKEN', '')}",
+        f"LANGUAGES={config['languages']}",
     ]
     
     # Write the env file
