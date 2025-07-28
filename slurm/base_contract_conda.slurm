@@ -1,13 +1,11 @@
 #!/bin/bash
-#SBATCH --job-name=lm_hardness-hf
-#SBATCH --output=%j.out         # Nombre del archivo de salida
-#SBATCH --error=%j.err          # Nombre del archivo de error
-#SBATCH --partition=dgx
+#SBATCH --job-name=llm_evaluation_harness
+#SBATCH --output=%j.out
+#SBATCH --error=%j.err          
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=32G                      
+#SBATCH --partition=dgx          
 #SBATCH --gres=gpu:2
-#SBATCH --mem=32GB
-#SBATCH --nodes=1
-#SBATCH --cpus-per-task=64
-#SBATCH --time=48:00:00
 
 # Activar entorno
 source ~/anaconda3/etc/profile.d/conda.sh

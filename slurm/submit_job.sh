@@ -40,11 +40,11 @@ echo "Job ID: $JOB_ID"
 ## GENERATING ENVIRONMENT FILE DOCKER
 if [ "$DOCKER_MODE" = true ]; then
   echo "Generating environment file from config: $CONFIG_FILE and to be used in DOCKER mode"
-  python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
+  python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
 else
 ## GENERATION ENVIROMENT FILE FOR CONDA
   echo "Generating environment file from config: $CONFIG_FILE and to be used in CONDA mode"
-  python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID"
+  python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID"
 fi
 
 ENV_FILE=".env_$JOB_ID"
