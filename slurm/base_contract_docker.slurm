@@ -1,16 +1,17 @@
 #!/bin/bash
-#SBATCH --job-name=v7_llm_evaluation_harness          # Nombre del trabajo
+#SBATCH --job-name=llm_evaluation_harness          # Nombre del trabajo
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
 #SBATCH --cpus-per-task=32             # Número de CPUs por tarea
-#SBATCH --mem=64G                      # Memoria por nodo
+#SBATCH --mem=32G                      # Memoria por nodo
 #SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
 #SBATCH --gres=gpu:2
 # Cargar variables de entorno desde el archivo .env
 set -a
-source .env_v7
+source .env
 set +a
 
+source /home/gplsi/santi/anaconda3/etc/profile.d/conda.sh
 
 CPUSET=$(taskset -cp $$ | awk -F: '{print $2}' | tr -d ' ') #Número de gpus a usar
 echo "SLURM-assigned CPU cores: $CPUSET"
@@ -39,7 +40,13 @@ echo "USER ID: $USER_ID"
 echo "GROUP ID: $GROUP_ID"
 
 docker ps
-docker build --network=host --build-arg USER_ID=$USER_ID --build-arg GROUP_ID=$GROUP_ID -t lm-evaluation-harness:latest .
+docker build \
+  --network=host \
+  --build-arg USER_ID=$USER_ID \
+  --build-arg GROUP_ID=$GROUP_ID \
+  -f ../Dockerfile \
+  -t lm-evaluation-harness:latest \
+  ..
 echo "Running lm-evaluation-harness Docker container..."
 docker run --rm \
   --cpuset-cpus="$CPUSET" \
@@ -56,17 +63,15 @@ docker run --rm \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
   --env SHOTS="${SHOTS}" \
+  --env OUTPUT_DIR="${OUTPUT_DIR}" \
   --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
   --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
+  --env LANGUAGES="${LANGUAGES}" \
   --volume $MODELS_FOLDER:/models \
   --volume $EVALUATION_FOLDER:/home/user/app/evaluaciones \
   --volume $EVALUATION_FOLDER_GOLD:/home/user/app/evaluaciones_gold \
-  --volume ./outputLogs:/home/user/app/outputLogs/ \
+  --volume ../outputLogs:/home/user/app/outputLogs/ \
   lm-evaluation-harness:latest 
-  #--name gplsi_lm-evaluation-harness \
-  #lm-evaluation-harness
-  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/results:/home/user/app/results \
-  #--volume /home/gplsi/GPLSI/ALIA/modelos/Continual/reports:/home/user/app/reports \
   
 
 
