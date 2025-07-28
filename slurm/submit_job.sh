@@ -6,6 +6,10 @@ GPU_COUNT=2
 PARTITION="dgx"
 MEMORY="32G"
 
+# ACTIVATE HARDNESS ENVIRONMENT
+source /home/gplsi/rst29/anaconda3/etc/profile.d/conda.sh
+conda activate hardness
+
 while getopts ":c:dg:m:p:" opt; do
   case $opt in
     c)
@@ -69,6 +73,7 @@ echo "Expermient: $JOB_ID"
 mkdir -m 770 -p ./experiments/$JOB_ID
 mkdir -m 770 -p ./experiments/$JOB_ID/outputLogs
 mv ./$ENV_FILE ./experiments/$JOB_ID
+cp $CONFIG_FILE ./experiments/$JOB_ID
 
 # Create a temporary SLURM script with the correct env file
 TMP_SCRIPT="slurm_job_${JOB_ID}.slurm"

@@ -94,9 +94,12 @@ else
                 --seed 1234
         fi
     else
+        PORT=$((29500 + (RANDOM % 1000) + 1))
         if [ "${instruct}" == "True" ]; then
             echo "The model name does not contain '.nemo' and is an instruct model."
-            accelerate launch -m lm_eval --model hf \
+            
+            accelerate launch --main_process_port  $PORT \
+                         -m lm_eval --model hf \
                         --model_args pretrained=$model,trust_remote_code=True \
                         --tasks ${dataset} \
                         --num_fewshot $few_shot \
@@ -108,7 +111,8 @@ else
                         --wandb_args project=$wandb,entity=gplsi_continual
         else
         echo "The model name does not contain '.nemo'."
-        accelerate launch -m lm_eval --model hf \
+        accelerate launch -main_process_port  $PORT \ 
+             -m lm_eval --model hf \
             --model_args pretrained=$model,trust_remote_code=True \
             --tasks ${dataset} \
             --num_fewshot $few_shot \
@@ -116,6 +120,7 @@ else
             --output_path $output_dir \
             --log_samples \
             --seed 1234 \
+            --main_process_port  $PORT \
             --wandb_args project=$wandb,entity=gplsi_continual
         fi
     fi

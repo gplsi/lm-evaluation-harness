@@ -22,13 +22,16 @@ def sanitize_filename(name):
     return re.sub(r'[^a-zA-Z0-9_-]', '_', name)
 
 
-def generate_env_file(config, env_id):
+def generate_env_file(config, env_id, docker_mode):
 
     
     # Use evaluation_name for the experiment name
     experiment_name = sanitize_filename(config['evaluation_name']) 
     # Parse model names
     models_names = config['models']['models_names']
+    output_dir= str(os.path.abspath('./experiments'))+'/'+str(env_id)
+    if docker_mode == True:
+        output_dir= '.'
     # Create the env file content
     env_content = [
         f"USER_ID=$(id -u)",
@@ -44,6 +47,7 @@ def generate_env_file(config, env_id):
         f"WANDB_API_KEY={os.environ.get('WANDB_API_KEY', '')}",
         f"HF_TOKEN={os.environ.get('HF_TOKEN', '')}",
         f"LANGUAGES={config['languages']}",
+        f"OUTPUT_DIR={output_dir}",
     ]
     
     # Write the env file
@@ -196,7 +200,7 @@ def main():
     print(f"Generating environment file for: {config['evaluation_name']}")
     
     # Generate environment file from config
-    env_file = generate_env_file(config, env_id)
+    env_file = generate_env_file(config, env_id,docker_mode)
     
     print(f"Environment file created: {env_file}")
     print(f"You can now run: bash launch_job.sh {env_file}")

@@ -1,6 +1,6 @@
-task: "instruct_evaluation"
-description: "Configuration file for evaluation of instruction-following models."
 evaluation_name: "<<model_name>>_evaluation"
+description: "Configuration file for evaluation of instruction-following models."
+
 
 models:
   local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface

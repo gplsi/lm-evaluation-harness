@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check if correct number of arguments are passed
-if [ "$#" -ne 5 ]; then
-    echo "Usage: $0 <model_route> <WANDB> <INSTRUCT> <N_SHOTS> <LANGUAGES>"
+if [ "$#" -ne 6 ]; then
+    echo "Usage: $0 <model_route> <WANDB> <INSTRUCT> <N_SHOTS> <LANGUAGES> <OUTPUT_DIR>"
     exit 1
 fi
 
@@ -16,16 +16,16 @@ WANDB=$2
 INSTRUCT=$3 # INSTRUCT="True" means that the model is instruccion-tuned and has to be evalutaed with an speciifc flag
 SHOTS=$4 # Number of shots for the tasks, 0 means no shots
 IFS=',' read -r -a arr_languages <<< $5 # Languages to evaluate, separated by commas stored in arr_a  
-
+OUTPUT_DIR= $6
 
 #echo $INSTRUCT
 
 # Get current directory
-current_dir=$(pwd)
 
-echo "Current directory: $current_dir"
+
+echo "Current directory: $OUTPUT_DIR"
 # Define the main output logs directory
-OUTPUT_MAIN_DIR="${current_dir}/outputLogs"
+OUTPUT_MAIN_DIR="${OUTPUT_DIR}/outputLogs"
 
 # Create the subfolder inside outputLogs if it doesn't exist
 echo "Directory created: $OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"

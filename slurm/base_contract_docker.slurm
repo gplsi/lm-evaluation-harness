@@ -11,6 +11,7 @@ set -a
 source .env
 set +a
 
+source /home/gplsi/santi/anaconda3/etc/profile.d/conda.sh
 
 CPUSET=$(taskset -cp $$ | awk -F: '{print $2}' | tr -d ' ') #Número de gpus a usar
 echo "SLURM-assigned CPU cores: $CPUSET"
@@ -62,6 +63,7 @@ docker run --rm \
   --env GROUP_ID="${GROUP_ID}" \
   --env INSTRUCT_EVALUATION="${INSTRUCT_EVALUATION}" \
   --env SHOTS="${SHOTS}" \
+  --env OUTPUT_DIR="${OUTPUT_DIR}" \
   --env EVALUATION_FOLDER=/home/user/app/evaluaciones \
   --env EVALUATION_FOLDER_GOLD=/home/user/app/evaluaciones_gold \
   --env LANGUAGES="${LANGUAGES}" \

@@ -1,6 +1,6 @@
-task: "base_evaluation"
-description: "Configuration file for evaluation of llm_Models that has to be done using Hugging Face"
 evaluation_name: "HuggingFace evaluation"
+description: "Configuration file for evaluation of llm_Models that has to be done using Hugging Face"
+
 
 models:
   local: False # Set to True if the model is hosted locally of False if it is evlauated from huggingface
