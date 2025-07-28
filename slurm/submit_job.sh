@@ -37,11 +37,12 @@ JOB_ID=$(date +%Y%m%d_%H%M%S)_$$  # timestamp + process ID
 
 echo "Job ID: $JOB_ID"
 
+## GENERATING ENVIRONMENT FILE DOCKER
 if [ "$DOCKER_MODE" = true ]; then
   echo "Generating environment file from config: $CONFIG_FILE and to be used in DOCKER mode"
   python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
 else
-  # Generate environment file using generate_env.sh with custom ID
+## GENERATION ENVIROMENT FILE FOR CONDA
   echo "Generating environment file from config: $CONFIG_FILE and to be used in CONDA mode"
   python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID"
 fi
@@ -61,13 +62,20 @@ mv ./$ENV_FILE ./experiments/$JOB_ID
 # Create a temporary SLURM script with the correct env file
 TMP_SCRIPT="slurm_job_${JOB_ID}.slurm"
 
-# Copy the base contract and replace the env source line
-sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
-    -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
-    -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
-    -e "s|--volume ../outputLogs:/home/user/app/outputLogs/|--volume ./experiments/$JOB_ID/outputLogs:/home/user/app/outputLogs/|g" \
-    base_contract.slurm > $TMP_SCRIPT
 
+
+if [ "$DOCKER_MODE" = true ]; then
+  sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
+      -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
+      -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
+      -e "s|--volume ../outputLogs:/home/user/app/outputLogs/|--volume ./experiments/$JOB_ID/outputLogs:/home/user/app/outputLogs/|g" \
+      base_contract_docker.slurm > $TMP_SCRIPT
+else
+  sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
+      -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
+      -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
+      base_contract_conda.slurm > $TMP_SCRIPT
+fi
 
 # Make it executable
 chmod +x $TMP_SCRIPT

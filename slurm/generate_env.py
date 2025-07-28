@@ -119,6 +119,11 @@ def check_evaluation_configuration(config):
     # Check if shots is a non-negative integer
     if not isinstance(config['evaluation']['shots'], int) or config['evaluation']['shots'] < 0:
         raise ValueError("Shots must be a non-negative integer")
+
+    if not os.path.exists(config['evaluation']['evaluation_folder']):
+        raise ValueError(f"Evaluation folder does not exist: {config['evaluation']['evaluation_folder']}")
+    if not os.path.exists(config['evaluation']['evaluation_folder_gold']):
+        raise ValueError(f"Evaluation folder gold does not exist: {config['evaluation']['evaluation_folder_gold']}")
     
 
 def check_languages_configuration(config):
