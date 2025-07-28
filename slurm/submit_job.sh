@@ -2,15 +2,26 @@
 
 CONFIG_FILE=""
 DOCKER_MODE=false
+GPU_COUNT=2
+PARTITION="dgx"
+MEMORY="32G"
 
-# Parse options: c requires an argument, d is a flag without argument
-while getopts ":c:d" opt; do
+while getopts ":c:dg:m:p:" opt; do
   case $opt in
     c)
       CONFIG_FILE="$OPTARG"
       ;;
     d)
       DOCKER_MODE=true
+      ;;
+    g)
+      GPU_COUNT="$OPTARG"
+      ;;
+    m)
+      MEMORY="$OPTARG"
+      ;;
+    p)
+      PARTITION="$OPTARG"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -26,7 +37,7 @@ done
 # Check required -c argument
 if [[ -z "$CONFIG_FILE" ]]; then
   echo "Error: -c <config_file.yaml> is required"
-  echo "Usage: $0 -c <config_file.yaml> [-d]"
+  echo "Usage: $0 -c <config_file.yaml> [-d] [-g <gpu_count>] [-m <memory>] [-p <partition>]"
   exit 1
 fi
 
@@ -67,12 +78,18 @@ TMP_SCRIPT="slurm_job_${JOB_ID}.slurm"
 if [ "$DOCKER_MODE" = true ]; then
   sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
       -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
+      -e "s|#SBATCH --gres=gpu:2|#SBATCH --gres=gpu:$GPU_COUNT|g" \
+      -e "s|#SBATCH --partition=dgx|#SBATCH --partition=$PARTITION|g" \
+      -e "s|#SBATCH --mem=32G|#SBATCH --mem=$MEMORY|g" \
       -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
       -e "s|--volume ../outputLogs:/home/user/app/outputLogs/|--volume ./experiments/$JOB_ID/outputLogs:/home/user/app/outputLogs/|g" \
       base_contract_docker.slurm > $TMP_SCRIPT
 else
   sed -e "s|#SBATCH --output=%j.out|#SBATCH --output=./experiments/$JOB_ID/%j.out|g" \
       -e "s|#SBATCH --error=%j.err|#SBATCH --error=./experiments/$JOB_ID/%j.err|g" \
+      -e "s|#SBATCH --gres=gpu:2|#SBATCH --gres=gpu:$GPU_COUNT|g" \
+      -e "s|#SBATCH --partition=dgx|#SBATCH --partition=$PARTITION|g" \
+      -e "s|#SBATCH --mem=32G|#SBATCH --mem=$MEMORY|g" \
       -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
       base_contract_conda.slurm > $TMP_SCRIPT
 fi
