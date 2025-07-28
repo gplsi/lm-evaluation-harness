@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# filepath: /home/gplsi/Documentos/ALIA/lm-evaluation-harness/generate_env.py
-
 import argparse
 import os
 import yaml
@@ -12,6 +9,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Generate environment file from YAML configuration")
     parser.add_argument("--config", type=str, required=True, help="Path to the YAML configuration file")
     parser.add_argument("--env-id", type=str, required=True, help="Identifier for the enviroment file")
+    parser.add_argument('--docker', action='store_true', help='Run in Docker mode')
 
     return parser.parse_args()
 
@@ -30,7 +28,7 @@ def generate_env_file(config, env_id):
     # Use evaluation_name for the experiment name
     experiment_name = sanitize_filename(config['evaluation_name']) 
     # Parse model names
-    models_names = config['models']['models_names'].replace(',', ' ')
+    models_names = config['models']['models_names']
     # Create the env file content
     env_content = [
         f"USER_ID=$(id -u)",
@@ -55,7 +53,7 @@ def generate_env_file(config, env_id):
     
     return env_file
 
-def check_model_configuration(config):
+def check_model_configuration(config,docker_mode):
     """Check if the model configuration is valid"""
     required_fields = ['local', 'models_names'] if config['models']['local'] == False else ['local', 'models_names','models_path']
 
@@ -75,9 +73,37 @@ def check_model_configuration(config):
         # Check if all specified models exist in the models path
         for model_name in models_names:
             model_name = model_name.strip()
-            model_path = models_path +'/'+ model_name
+            model_path = Path(str(models_path) +'/'+ model_name)
             if not model_path.exists():
                 raise ValueError(f"Model not found in models path: {model_path}")
+        
+        # DOCKER MODEL IMPLIES MAPPING TO THE /models/ directory in the container where the volumes are mounted
+        if docker_mode:
+            models_list_str = ""
+            count_models = 0
+            for i in range(len(models_names)):
+                if count_models != 0:
+                    models_list_str += ','
+                
+                models_list_str += '/models/'+models_names[i]
+                count_models += 1
+            
+            
+            config['models']['models_names'] = models_list_str
+        # OTHERWISE, THE EXECUTION MODE WILL USE CONDA AND ABSOLUTE PATHS MUST BE ADDED.
+        else:
+            models_list_str = ""
+            count_models = 0
+            models_path_str = config['models']['models_path']
+            for i in range(len(models_names)):
+                if count_models != 0:
+                    models_list_str += ','
+
+                models_list_str += models_path_str +'/'+models_names[i]
+                count_models += 1
+
+            config['models']['models_names'] = models_list_str
+
 
 def check_evaluation_configuration(config):
     """Check if the evaluation configuration is valid"""
@@ -129,12 +155,15 @@ def check_languages_configuration(config):
                     else:
                         languages_text_to_evaluate += "," + dict_languages[lang_name]
                     count_languages_to_evaluate += 1
-                    
+
+    if count_languages_to_evaluate == 0:
+        raise ValueError("At least one language must be enabled for evaluation") 
+                   
     config['languages'] = languages_text_to_evaluate
 
 
         
-def check_config(config):
+def check_config(config,docker_mode):
     """Check if the config has all required fields"""
     required_fields = [
         'models', 'evaluation','languages' 
@@ -144,7 +173,7 @@ def check_config(config):
             raise ValueError(f"Missing required field in config: {field}")
     
     # Check models configuration
-    check_model_configuration(config)
+    check_model_configuration(config,docker_mode)
     check_evaluation_configuration(config)
     check_languages_configuration(config)
     
@@ -155,7 +184,10 @@ def main():
     args = parse_arguments()
     config = read_config(args.config)
     env_id = args.env_id
-    check_config(config)
+    docker_mode = args.docker
+
+    print("Docker mode:", docker_mode)
+    check_config(config,docker_mode)
     print(f"Generating environment file for: {config['evaluation_name']}")
     
     # Generate environment file from config

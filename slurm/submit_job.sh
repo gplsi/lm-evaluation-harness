@@ -1,19 +1,35 @@
 #!/bin/bash
 
-# Check if config file was provided
-if [ $# -ne 1 ]; then
-  echo "Usage: $0 <config_file.yaml>"
-  echo "Example: $0 config_experiment.yaml"
+CONFIG_FILE=""
+DOCKER_MODE=false
+
+# Parse options: c requires an argument, d is a flag without argument
+while getopts ":c:d" opt; do
+  case $opt in
+    c)
+      CONFIG_FILE="$OPTARG"
+      ;;
+    d)
+      DOCKER_MODE=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+# Check required -c argument
+if [[ -z "$CONFIG_FILE" ]]; then
+  echo "Error: -c <config_file.yaml> is required"
+  echo "Usage: $0 -c <config_file.yaml> [-d]"
   exit 1
 fi
 
-CONFIG_FILE=$1
-
-# Ensure the config file exists
-if [ ! -f "$CONFIG_FILE" ]; then
-  echo "Error: Configuration file $CONFIG_FILE not found"
-  exit 1
-fi
 
 # Generate unique ID for this job
 JOB_ID=$(date +%Y%m%d_%H%M%S)_$$  # timestamp + process ID
@@ -21,9 +37,15 @@ JOB_ID=$(date +%Y%m%d_%H%M%S)_$$  # timestamp + process ID
 
 echo "Job ID: $JOB_ID"
 
-# Generate environment file using generate_env.sh with custom ID
-echo "Generating environment file from config: $CONFIG_FILE"
-python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID"
+if [ "$DOCKER_MODE" = true ]; then
+  echo "Generating environment file from config: $CONFIG_FILE and to be used in DOCKER mode"
+  python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
+else
+  # Generate environment file using generate_env.sh with custom ID
+  echo "Generating environment file from config: $CONFIG_FILE and to be used in CONDA mode"
+  python3 generate_env.sh --config "$CONFIG_FILE" --env-id "$JOB_ID"
+fi
+
 ENV_FILE=".env_$JOB_ID"
 if [ ! -f "$ENV_FILE" ]; then
   echo "Error: Failed to generate environment file: $ENV_FILE"

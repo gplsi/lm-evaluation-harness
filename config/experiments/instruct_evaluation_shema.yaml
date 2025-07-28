@@ -1,0 +1,22 @@
+task: "instruct_evaluation Aitana"
+description: "Configuration file for evaluation of instruction-following models."
+evaluation_name: "Aitana instruction evaluations"
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  models_names: step-002756,step-005512 # List of models nambes to be evaluated
+  models_path: /home/gplsi/GPLSI/ALIA/modelos/Instruction/Intruccion_v8_salamandra_2B/hf_models # List of paths to the models to be evaluated
+
+evaluation:
+  evaluation_folder: /home/gplsi/GPLSI/ALIA/modelos/Instruction/Intruccion_v8_salamandra_2B/evaluaciones # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /home/gplsi/GPLSI/ALIA/modelos/Evaluation/Instruction/gold # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: True
+  shots: 0 # Number of shots to be used in the evaluation
+
+wandb_project: "Prueba" # Name of the wandb project to log the results
+
+languages:
+  - Spanish: false # Set to true if want to evaluate the model in Spanish tasks
+  - English: false # Set to true if want to evaluate the model in English tasks
+  - Valencian: true # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: false # Set to true if want to evaluate the model in Catalan tasks

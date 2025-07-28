@@ -15,7 +15,7 @@ evaluation:
 wandb_project: "prueba" # Name of the wandb project to log the results
 
 languages:
-  - Spanish: true # Set to true if want to evaluate the model in Spanish tasks
-  - English: true # Set to true if want to evaluate the model in English tasks
+  - Spanish: false # Set to true if want to evaluate the model in Spanish tasks
+  - English: false # Set to true if want to evaluate the model in English tasks
   - Valencian: true # Set to true if want to evaluate the model in Valencian tasks
-  - Catalan: true # Set to true if want to evaluate the model in Catalan tasks
+  - Catalan: false # Set to true if want to evaluate the model in Catalan tasks
