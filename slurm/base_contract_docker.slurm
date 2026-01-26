@@ -2,7 +2,7 @@
 #SBATCH --job-name=llm_evaluation_harness          # Nombre del trabajo
 #SBATCH --output=%j.out         # Nombre del archivo de salida
 #SBATCH --error=%j.err          # Nombre del archivo de error
-#SBATCH --cpus-per-task=32             # Número de CPUs por tarea
+#SBATCH --cpus-per-task=16             # Número de CPUs por tarea
 #SBATCH --mem=32G                      # Memoria por nodo
 #SBATCH --partition=dgx          # Cola (partición) a la que enviar el trabajo
 #SBATCH --gres=gpu:2

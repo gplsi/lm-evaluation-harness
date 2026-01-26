@@ -16,6 +16,6 @@ yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" paws_es_spanish_bench
 
 ##yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" flores_es $SHOTS False $WANDB 3_Spanish $INSTRUCT >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Spanish.txt"  2>&1  || true
 
-yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" escola,openbookqa_es,xquad_es $SHOTS False $WANDB 3_Spanish $INSTRUCT  >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Spanish.txt" 2>&1 || true
-
+yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" openbookqa_es,xquad_es $SHOTS False $WANDB 3_Spanish $INSTRUCT  >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Spanish.txt" 2>&1 || true
+yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" escola $SHOTS False $WANDB 4_Spanish $INSTRUCT  >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Spanish.txt" 2>&1 || true
 #yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" copa_es $SHOTS False $WANDB 4_Spanish $INSTRUCT  >  "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Spanish.txt" 2>&1 || true
