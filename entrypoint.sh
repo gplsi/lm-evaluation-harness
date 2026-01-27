@@ -13,8 +13,8 @@ for model in "${arr_models[@]}"; do
     echo "Evaluating $model"
     model_dir=$model
 
-    echo "./launch_scripts/execAllScripts_per_language.sh" $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS $LANGUAGES $OUTPUT_DIR
-    ./launch_scripts/execAllScripts_per_language.sh $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS $LANGUAGES $OUTPUT_DIR
+    echo "./launch_scripts/execAllScripts_per_language.sh" $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS $LANGUAGES $OUTPUT_DIR $VLLM
+    ./launch_scripts/execAllScripts_per_language.sh $model_dir $WANDB_PROJECT $INSTRUCT_EVALUATION $SHOTS $LANGUAGES $OUTPUT_DIR $VLLM
 done
 
 

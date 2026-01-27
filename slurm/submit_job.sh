@@ -5,12 +5,13 @@ DOCKER_MODE=false
 GPU_COUNT=2
 PARTITION="dgx"
 MEMORY="32G"
+VLLM=false
 
 # ACTIVATE HARDNESS ENVIRONMENT
 source /home/gplsi/rst29/anaconda3/etc/profile.d/conda.sh
 conda activate hardness
 
-while getopts ":c:dg:m:p:" opt; do
+while getopts ":c:dg:m:p:v" opt; do
   case $opt in
     c)
       CONFIG_FILE="$OPTARG"
@@ -27,6 +28,9 @@ while getopts ":c:dg:m:p:" opt; do
     p)
       PARTITION="$OPTARG"
       ;;
+    v)
+      VLLM=true
+      ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -41,7 +45,7 @@ done
 # Check required -c argument
 if [[ -z "$CONFIG_FILE" ]]; then
   echo "Error: -c <config_file.yaml> is required"
-  echo "Usage: $0 -c <config_file.yaml> [-d] [-g <gpu_count>] [-m <memory>] [-p <partition>]"
+  echo "Usage: $0 -c <config_file.yaml> [-d] [-g <gpu_count>] [-m <memory>] [-p <partition>] [-v]"
   exit 1
 fi
 
@@ -55,11 +59,19 @@ echo "Job ID: $JOB_ID"
 ## GENERATING ENVIRONMENT FILE DOCKER
 if [ "$DOCKER_MODE" = true ]; then
   echo "Generating environment file from config: $CONFIG_FILE and to be used in DOCKER mode"
-  python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
+  if [ "$VLLM" = true ]; then
+    python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker --vllm
+  else
+    python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID" --docker
+  fi
 else
 ## GENERATION ENVIROMENT FILE FOR CONDA
   echo "Generating environment file from config: $CONFIG_FILE and to be used in CONDA mode"
-  python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID"
+  if [ "$VLLM" = true ]; then
+    python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID" --vllm
+  else
+    python3 generate_env.py --config "$CONFIG_FILE" --env-id "$JOB_ID"
+  fi
 fi
 
 ENV_FILE=".env_$JOB_ID"

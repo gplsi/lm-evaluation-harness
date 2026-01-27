@@ -13,6 +13,7 @@ tensor_parallelism=$4
 wandb=$5
 execution_name=$6
 instruct=$7
+vllm=$8
 
 if [ "$computer" == "polaris" ]; then
     job_id=$PBS_JOBID
@@ -96,30 +97,57 @@ else
         PORT=$((29500 + (RANDOM % 1000) + 1))
         if [ "${instruct}" == "True" ]; then
             echo "The model name does not contain '.nemo' and is an instruct model."
-            
-            accelerate launch --main_process_port  $PORT \
-                         -m lm_eval --model hf \
-                        --model_args pretrained=$model,trust_remote_code=True \
-                        --tasks ${dataset} \
-                        --num_fewshot $few_shot \
-                        --batch_size 20 \
-                        --output_path $output_dir \
-                        --log_samples \
-                        --seed 1234 \
-                        --apply_chat_template \
-                        --wandb_args project=$wandb,entity=gplsi_continual
+             if [ "${vllm}" == "True" ]; then
+                accelerate launch --main_process_port  $PORT \
+                            -m lm_eval --model vllm \
+                            --model_args pretrained=$model,trust_remote_code=True \
+                            --tasks ${dataset} \
+                            --num_fewshot $few_shot \
+                            --batch_size auto \
+                            --output_path $output_dir \
+                            --log_samples \
+                            --seed 1234 \
+                            --apply_chat_template \
+                            --wandb_args project=$wandb,entity=gplsi_continual
+            else
+                accelerate launch --main_process_port  $PORT \
+                            -m lm_eval --model hf \
+                            --model_args pretrained=$model,trust_remote_code=True \
+                            --tasks ${dataset} \
+                            --num_fewshot $few_shot \
+                            --batch_size 20 \
+                            --output_path $output_dir \
+                            --log_samples \
+                            --seed 1234 \
+                            --apply_chat_template \
+                            --wandb_args project=$wandb,entity=gplsi_continual
+            fi
+
         else
         echo "The model name does not contain '.nemo'."
-            accelerate launch --main_process_port  $PORT \
-                         -m lm_eval --model hf \
-                        --model_args pretrained=$model,trust_remote_code=True \
-                        --tasks ${dataset} \
-                        --num_fewshot $few_shot \
-                        --batch_size 20 \
-                        --output_path $output_dir \
-                        --log_samples \
-                        --seed 1234 \
-                        --wandb_args project=$wandb,entity=gplsi_continual
+            if [ "${vllm}" == "True" ]; then
+                accelerate launch --main_process_port  $PORT \
+                            -m lm_eval --model vllm \
+                            --model_args pretrained=$model,trust_remote_code=True \
+                            --tasks ${dataset} \
+                            --num_fewshot $few_shot \
+                            --batch_size 20 \
+                            --output_path $output_dir \
+                            --log_samples \
+                            --seed 1234 \
+                            --wandb_args project=$wandb,entity=gplsi_continual
+            else
+                accelerate launch --main_process_port  $PORT \
+                            -m lm_eval --model vllm \
+                            --model_args pretrained=$model,trust_remote_code=True \
+                            --tasks ${dataset} \
+                            --num_fewshot $few_shot \
+                            --batch_size 20 \
+                            --output_path $output_dir \
+                            --log_samples \
+                            --seed 1234 \
+                            --wandb_args project=$wandb,entity=gplsi_continual
+            fi
         fi
     fi
 fi

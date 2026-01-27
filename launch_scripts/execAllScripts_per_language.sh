@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Check if correct number of arguments are passed
-if [ "$#" -ne 6 ]; then
-    echo "Usage: $0 <model_route> <WANDB> <INSTRUCT> <N_SHOTS> <LANGUAGES> <OUTPUT_DIR>"
+if [ "$#" -ne 7 ]; then
+    echo "Usage: $0 <model_route> <WANDB> <INSTRUCT> <N_SHOTS> <LANGUAGES> <OUTPUT_DIR> <VLLM>"
     exit 1
 fi
 
@@ -17,6 +17,7 @@ INSTRUCT=$3 # INSTRUCT="True" means that the model is instruccion-tuned and has 
 SHOTS=$4 # Number of shots for the tasks, 0 means no shots
 IFS=',' read -r -a arr_languages <<< $5 # Languages to evaluate, separated by commas stored in arr_a  
 OUTPUT_DIR= $6
+VLLM=$7
 
 #echo $INSTRUCT
 
@@ -34,17 +35,17 @@ mkdir -p "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER"
 for language in "${arr_languages[@]}"; do
 
     if [[ "$language" == "va" ]]; then
-        ./launch_scripts/languages/valencian_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER"
+        ./launch_scripts/languages/valencian_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER" $VLLM
     fi
     if [[ "$language" == "es" ]]; then
-        ./launch_scripts/languages/spanish_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER"
+        ./launch_scripts/languages/spanish_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER" $VLLM
     fi
     if [[ "$language" == "ca" ]]; then
-        ./launch_scripts/languages/catalan_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER"
+        ./launch_scripts/languages/catalan_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER" $VLLM
     fi
 
     if [[ "$language" == "en" ]]; then
-       ./launch_scripts/languages/english_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER"
+       ./launch_scripts/languages/english_scripts.sh "$MODEL_ROUTE" $SHOTS $WANDB $INSTRUCT "$OUTPUT_MAIN_DIR" "$OUTPUT_SUBFOLDER" $VLLM
     fi
 
 done

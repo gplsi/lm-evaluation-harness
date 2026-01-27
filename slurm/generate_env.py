@@ -10,6 +10,7 @@ def parse_arguments():
     parser.add_argument("--config", type=str, required=True, help="Path to the YAML configuration file")
     parser.add_argument("--env-id", type=str, required=True, help="Identifier for the enviroment file")
     parser.add_argument('--docker', action='store_true', help='Run in Docker mode')
+    parser.add_argument('--vllm', action='store_true', help='Use vLLM for evaluation')
 
     return parser.parse_args()
 
@@ -22,7 +23,7 @@ def sanitize_filename(name):
     return re.sub(r'[^a-zA-Z0-9_-]', '_', name)
 
 
-def generate_env_file(config, env_id, docker_mode):
+def generate_env_file(config, env_id, docker_mode,vllm):
 
     
     # Use evaluation_name for the experiment name
@@ -48,6 +49,7 @@ def generate_env_file(config, env_id, docker_mode):
         f"HF_TOKEN={os.environ.get('HF_TOKEN', '')}",
         f"LANGUAGES={config['languages']}",
         f"OUTPUT_DIR={output_dir}",
+        f"VLLM={str(vllm)}"
     ]
     
     # Write the env file
@@ -194,13 +196,14 @@ def main():
     config = read_config(args.config)
     env_id = args.env_id
     docker_mode = args.docker
+    vllm = args.vllm
 
     print("Docker mode:", docker_mode)
     check_config(config,docker_mode)
     print(f"Generating environment file for: {config['evaluation_name']}")
     
     # Generate environment file from config
-    env_file = generate_env_file(config, env_id,docker_mode)
+    env_file = generate_env_file(config, env_id,docker_mode,vllm)
     
     print(f"Environment file created: {env_file}")
     print(f"You can now run: bash launch_job.sh {env_file}")
