@@ -14,6 +14,9 @@ This directory contains production-ready SLURM scripts for running evaluations u
 # Submit a job using Docker
 ./submit_job.sh -c ../config/experiments/EXPERIMENT_NAME.yaml -d
 
+# Submit a job using VLLM as inference engine and with 1 gpu
+./submit_job.sh -c ../config/experiments/EXPERIMENT_NAME.yaml -p PARTITION_NAME -g 1 -v
+
 # Submit a job with custom resources
 ./submit_job.sh -c ../config/experiments/instruct_evaluation_schema.yaml -d -g 1 -m 64G -p PARTITION_NAME
 
@@ -32,6 +35,7 @@ tail -f ./experiments/<<EXPERMIENT_ID>>/<<JOB_ID_LM_EVALUATION_HARNESS>>.out
 * `-g`: GPU count (default: 2)
 * `-m`: Memory (default: 32G)
 * `-p`: Partition (default: **DGX**)
+* `-v`: Using VLLM as inference engine (default: **hf** HuggingFace Transformers)
 
 
 ## 🧰 Getting Started
