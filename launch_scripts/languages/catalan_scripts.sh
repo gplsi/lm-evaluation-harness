@@ -13,7 +13,7 @@ yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" belebele_cat_Latn,xnl
 
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" paws_ca,piqa_ca,siqa_ca,teca,wnli_ca,arc_ca_easy,arc_ca_challenge,xstorycloze_ca $SHOTS False $WANDB 2_Catalan $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_Catalan.txt" 2>&1 || true
 
-yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" catalanqa,mgsm_direct_ca,phrases_va $SHOTS False $WANDB 3_Catalan $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Catalan.txt" 2>&1 || true
+yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" catalanqa,mgsm_direct_ca $SHOTS False $WANDB 3_Catalan $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Catalan.txt" 2>&1 || true
 #yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" flores_ca $SHOTS False $WANDB > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Catalan.txt" 2>&1 || true
 
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" xquad_ca $SHOTS False $WANDB 4_Catalan $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Catalan.txt" 2>&1 || true

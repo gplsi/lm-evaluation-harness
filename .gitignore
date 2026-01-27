@@ -42,7 +42,6 @@ test_logs/
 
 # Caching
 lm_eval/caching/.cache
-<<<<<<< HEAD
 # don't track files created by wandb
 wandb
 examples/wandb
@@ -57,7 +56,6 @@ reports
 *.out
 slurm/experiments/
 slurm/slurm
-=======
 lm_cache/
 
 # Logging
@@ -73,4 +71,3 @@ examples/wandb/
 
 #uv
 uv.lock
->>>>>>> main

@@ -30,7 +30,7 @@ output_dir=$EVALUATION_FOLDER/results/$(basename ${model})/results:$(basename ${
 cuda_device_count=$(python -c "import torch; print(torch.cuda.device_count())")
 echo "Available GPUs: $cuda_device_count"
 echo "Instruct evaluation: $instruct"
-
+echo "VLLM inference: $vllm"
 
 if [[ $model == *".nemo"* ]]; then
     # If it contains ".nemo", do the following
@@ -100,7 +100,7 @@ else
              if [ "${vllm}" == "True" ]; then
                 accelerate launch --main_process_port  $PORT \
                             -m lm_eval --model vllm \
-                            --model_args pretrained=$model,trust_remote_code=True \
+                            --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
                             --batch_size auto \
@@ -128,7 +128,7 @@ else
             if [ "${vllm}" == "True" ]; then
                 accelerate launch --main_process_port  $PORT \
                             -m lm_eval --model vllm \
-                            --model_args pretrained=$model,trust_remote_code=True \
+                            --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
                             --batch_size 20 \
