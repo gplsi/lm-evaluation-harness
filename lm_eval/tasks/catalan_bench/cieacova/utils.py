@@ -1,189 +1,259 @@
+import ast
+
 import numpy as np
-from sklearn.metrics import f1_score
-
-import random
-import os
-
-import pandas as pd
+from datasets import Features, Sequence, Value, load_dataset
 
 
+DATASET_REPO = "gplsi/cieacova"
+CHOICE_CONFIG = "multiple_choice"
+GEN_CONFIG = "text_generation"
 
+_FEWSHOT_CHOICE_BY_INSTRUCTION = None
+_FEWSHOT_GEN_BY_INSTRUCTION = None
+
+_CIEACOVA_FEATURES = Features(
+    {
+        "Tarea": Value("string"),
+        "Instrucción": Value("string"),
+        "Pista": Value("string"),
+        "Pregunta": Value("string"),
+        "Respuesta": Sequence(Value("string")),
+        "Opciones": Sequence(Value("string")),
+        "Metadata": {
+            "Anotador": Value("string"),
+            "Año": Value("string"),
+            "Dificultad": Value("string"),
+            "Fuente": Value("string"),
+            "Idioma": Value("string"),
+            "Mes": Value("string"),
+            "N. Pregunta": Value("string"),
+            "Sección": Value("string"),
+        },
+        "Prompt": Value("string"),
+        "Subtarea": Value("string"),
+    }
+)
+
+
+def load_cieacova_dataset(**kwargs):
+    dataset_repo = kwargs.pop("dataset_repo", DATASET_REPO)
+    dataset_name = kwargs.pop("dataset_name", None)
+    kwargs.pop("config_source", None)
+    if not dataset_name:
+        raise ValueError("dataset_name must be specified in dataset_kwargs")
+
+    allowed_kwargs = {
+        "cache_dir",
+        "data_dir",
+        "data_files",
+        "download_config",
+        "download_mode",
+        "keep_in_memory",
+        "num_proc",
+        "revision",
+        "save_infos",
+        "split",
+        "storage_options",
+        "streaming",
+        "token",
+        "verification_mode",
+    }
+    filtered_kwargs = {k: v for k, v in kwargs.items() if k in allowed_kwargs}
+
+    # Force a stable schema across train/test to avoid null-vs-string cast failures.
+    return load_dataset(
+        dataset_repo,
+        dataset_name,
+        features=_CIEACOVA_FEATURES,
+        **filtered_kwargs,
+    )
+
+
+def _parse_list_like(value):
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, tuple):
+        return [str(item).strip() for item in value if str(item).strip()]
+    if isinstance(value, str):
+        cleaned = value.strip()
+        if not cleaned:
+            return []
+        try:
+            parsed = ast.literal_eval(cleaned)
+            if isinstance(parsed, (list, tuple)):
+                return [str(item).strip() for item in parsed if str(item).strip()]
+        except (SyntaxError, ValueError):
+            pass
+        return [part.strip().strip("'\"") for part in cleaned.strip("[]").split(",") if part.strip()]
+    return [str(value).strip()]
+
+
+def _normalize_instruction(text):
+    if not text:
+        return ""
+    return text.replace('"[MASK]"', "[MASK]")
+
+
+def _format_option_lines(options):
+    if not options:
+        return ""
+    return "\n".join(f"- {opt}" for opt in options)
+
+
+def _build_choice_fewshot_map():
+    train = load_cieacova_dataset(dataset_name=CHOICE_CONFIG, split="train")
+    mapping = {}
+    for row in train:
+        instruction = _normalize_instruction(row.get("Instrucción", ""))
+        if not instruction or instruction in mapping:
+            continue
+        options = _parse_list_like(row.get("Opciones"))
+        answers = _parse_list_like(row.get("Respuesta"))
+        mapping[instruction] = {
+            "Pregunta": row.get("Pregunta", ""),
+            "Opciones": options,
+            "Respuesta": answers[0] if answers else "",
+        }
+    return mapping
+
+
+def _build_gen_fewshot_map():
+    train = load_cieacova_dataset(dataset_name=GEN_CONFIG, split="train")
+    mapping = {}
+    for row in train:
+        instruction = _normalize_instruction(row.get("Instrucción", ""))
+        if not instruction or instruction in mapping:
+            continue
+        answers = _parse_list_like(row.get("Respuesta"))
+        mapping[instruction] = {
+            "Pregunta": row.get("Pregunta", ""),
+            "Pista": row.get("Pista", ""),
+            "Respuesta": answers[0] if answers else "",
+        }
+    return mapping
+
+
+def _get_choice_fewshot_map():
+    global _FEWSHOT_CHOICE_BY_INSTRUCTION
+    if _FEWSHOT_CHOICE_BY_INSTRUCTION is None:
+        _FEWSHOT_CHOICE_BY_INSTRUCTION = _build_choice_fewshot_map()
+    return _FEWSHOT_CHOICE_BY_INSTRUCTION
+
+
+def _get_gen_fewshot_map():
+    global _FEWSHOT_GEN_BY_INSTRUCTION
+    if _FEWSHOT_GEN_BY_INSTRUCTION is None:
+        _FEWSHOT_GEN_BY_INSTRUCTION = _build_gen_fewshot_map()
+    return _FEWSHOT_GEN_BY_INSTRUCTION
 
 
 def process_docs(dataset):
-    TRAIN_FILE = "/home/gplsi/santi/translate_datasets/cieacova/multiple-choice-train.parquet"
-    df_train = pd.read_parquet(TRAIN_FILE)
-    # Filtramos posibles nulos en la instrucción al crear el diccionario
-    df_train = df_train.dropna(subset=["Instrucción"])
-    INSTRUCCION_MAP = df_train.drop_duplicates(subset=["Instrucción"]).set_index("Instrucción").to_dict(orient="index")
+    fewshot_by_instruction = _get_choice_fewshot_map()
+
     def _process_doc(doc):
-        # 1. Extracción segura de Opciones (evitando que rompa si es None)
-        opciones_brutas = doc.get("Opciones")
-        if opciones_brutas is None:
-            opciones = [""]
-        elif isinstance(opciones_brutas, str):
-            opciones = [opt.strip() for opt in opciones_brutas.strip("[]").split(",") if opt.strip()]
-        else:
-            opciones = list(opciones_brutas) # Si ya es una lista
-            
-        # 2. Extracción segura de Respuestas
-        respuesta_bruta = doc.get("Respuesta")
-        if respuesta_bruta is None:
-            respuestas = [""]
-        elif isinstance(respuesta_bruta, str):
-            respuestas = [ans.strip() for ans in respuesta_bruta.strip("[]").split(",") if ans.strip()]
-        else:
-            respuestas = list(respuesta_bruta)
+        instruction = _normalize_instruction(doc.get("Instrucción", ""))
+        options = _parse_list_like(doc.get("Opciones"))
+        answers = _parse_list_like(doc.get("Respuesta"))
 
-        # 3. Cálculo de índices seguro
-        correct_indices = [opciones.index(ans) for ans in respuestas if ans in opciones]
-        if not correct_indices: 
+        correct_indices = [options.index(answer) for answer in answers if answer in options]
+        if not correct_indices:
             correct_indices = [0]
-        
-        doc["parsed_opciones"] = opciones
-        doc["parsed_respuesta"] = correct_indices
 
-        # 4. Inyección del Few-Shot Único
-        inst_actual = doc.get("Instrucción")
-        
-        # Verificamos que la instrucción no sea None y exista en nuestro mapa
-        if inst_actual and inst_actual in INSTRUCCION_MAP:
-            ej = INSTRUCCION_MAP[inst_actual]
+        fewshot = fewshot_by_instruction.get(instruction)
+        if fewshot:
+            option_lines = _format_option_lines(fewshot["Opciones"])
             doc["dynamic_fewshot"] = (
-                f"Exemple de Text a resoldre:\n{ej.get('Pregunta', '')}\n\n"
-                f"Exemple Opcions de resposta:\n{ej.get('Opciones', '')}\n\n"
-                f"Exemple Resposta:\n{ej.get('Respuesta', '')[0]}\n\n"
-                f"---\n\n"
+                f"Exemple de text a resoldre:\n{fewshot['Pregunta']}\n\n"
+                f"Exemple opcions de resposta:\n{option_lines}\n\n"
+                f"Exemple resposta:\n{fewshot['Respuesta']}\n\n"
+                "---\n\n"
             )
         else:
-            doc["dynamic_fewshot"] = "ERROR: Instrucción no encontrada para few-shot."
+            doc["dynamic_fewshot"] = ""
 
+        doc["Instrucción"] = instruction
+        doc["parsed_opciones"] = options if options else [""]
+        doc["parsed_opciones_text"] = _format_option_lines(doc["parsed_opciones"])
+        doc["parsed_respuesta"] = correct_indices
         return doc
 
     return dataset.map(_process_doc)
 
 
 def process_results(doc, results):
-    """
-    Toma los resultados brutos del modelo y calcula acc y acc_norm.
-    """
     lls = [res[0] if isinstance(res, tuple) else res for res in results]
-    
-    opciones = doc["parsed_opciones"]
-    
-    lls_norm = [ll / max(1, len(opt)) for ll, opt in zip(lls, opciones)]
-    
-    pred = np.argmax(lls)             # Predicción bruta
-    pred_norm = np.argmax(lls_norm)   # Predicción normalizada
-    
+    options = doc["parsed_opciones"]
     targets = doc["parsed_respuesta"]
-    
+
+    lls_norm = [ll / max(1, len(opt)) for ll, opt in zip(lls, options)]
+    pred = int(np.argmax(lls))
+    pred_norm = int(np.argmax(lls_norm))
+
     acc = 1.0 if pred in targets else 0.0
     acc_norm = 1.0 if pred_norm in targets else 0.0
-    
-    dificultad = doc.get("Metadata", {}).get("Dificultad", "Desconocida")
-    
+
+    difficulty = doc.get("Metadata", {}).get("Dificultad", "Desconocida")
+    subtask = doc['Subtarea']
     return {
         "acc": acc,
         "acc_norm": acc_norm,
-        f"acc_{dificultad}": acc,
-        f"acc_norm_{dificultad}": acc_norm
+        f"acc_{difficulty}": acc,
+        f"acc_norm_{difficulty}": acc_norm,
+        f"acc_{subtask}": acc,
+        f"acc_norm_{subtask}": acc_norm,
     }
 
 
-
-
 def process_gen_docs(dataset):
-    TRAIN_FILE = "/home/gplsi/santi/translate_datasets/cieacova/text-generation-train.parquet"
-    df_train = pd.read_parquet(TRAIN_FILE)
-    # Filtramos posibles nulos en la instrucción al crear el diccionario
-    df_train = df_train.dropna(subset=["Instrucción"])
-    INSTRUCCION_MAP = df_train.drop_duplicates(subset=["Instrucción"]).set_index("Instrucción").to_dict(orient="index")
+    fewshot_by_instruction = _get_gen_fewshot_map()
+
     def _process_doc(doc):
-        respuesta_str = doc.get("Respuesta", "")
-        
-        # Si viene como un string tipo "[opcion1, opcion2]"
-        if isinstance(respuesta_str, str):
-            # Quitamos los corchetes, separamos por comas y limpiamos comillas/espacios
-            respuestas = [
-                ans.strip().strip("'\"") 
-                for ans in respuesta_str.strip("[]").split(",") 
-                if ans.strip()
-            ]
-        else:
-            # Si ya era una lista real de Python
-            respuestas = respuesta_str
-            
-        # Guardamos la lista limpia para usarla como target
-        doc["parsed_respuesta"] = respuestas
-        doc['rules'] = (f"Regles:\n"
-        f"- Segueix la descripció de la tasca de forma precisa.\n" 
-        f"- Utilitza el text d’entrada com principal font d’informació.\n" 
-        f"- Utilitza la pista únicament si és rellevant per a la tasca.\n" 
-        f"- Produeix una resposta que siga completa, coherent i que responga directament a la tasca.\n"
-        f"- El llenguatge i estil de la resposta han de ser iguals que el de la instrucció.\n\n")
+        instruction = _normalize_instruction(doc.get("Instrucción", ""))
+        answers = _parse_list_like(doc.get("Respuesta"))
+        doc["parsed_respuesta"] = answers if answers else [""]
 
-
-
-
-
-
-        # 4. Inyección del Few-Shot Único
-        inst_actual = doc.get("Instrucción")
-        
-        # Verificamos que la instrucción no sea None y exista en nuestro mapa
-        if inst_actual and inst_actual in INSTRUCCION_MAP:
-            ej = INSTRUCCION_MAP[inst_actual]
-            pista = ej.get('Pista', '')
-            pista_section = f"Exemple PISTA:\n{pista}\n\n" if pista else ""
+        fewshot = fewshot_by_instruction.get(instruction)
+        if fewshot:
+            hint = fewshot.get("Pista", "")
+            hint_section = f"Exemple PISTA:\n{hint}\n\n" if hint else ""
             doc["dynamic_fewshot"] = (
-                f"Exemple de Text a resoldre:\n{ej.get('Pregunta', '')}\n\n"
-                f"{pista_section}"
-                f"Exemple Resposta:\n{ej.get('Respuesta', '')[0]}\n\n"
-                f"---\n\n"
+                f"Exemple de text a resoldre:\n{fewshot.get('Pregunta', '')}\n\n"
+                f"{hint_section}"
+                f"Exemple resposta:\n{fewshot.get('Respuesta', '')}\n\n"
+                "---\n\n"
             )
         else:
-            doc["dynamic_fewshot"] = "ERROR: Instrucción no encontrada para few-shot."
+            doc["dynamic_fewshot"] = ""
 
+        doc["Instrucción"] = instruction
         return doc
 
     return dataset.map(_process_doc)
 
 
 def clean_text(text, allowed_specials):
-        if not text: return ""
-        return ''.join(
-            c.lower() for c in text 
-            if c.isalnum() or c in allowed_specials
-        ).strip()
+    if not text:
+        return ""
+    return "".join(c.lower() for c in text if c.isalnum() or c in allowed_specials).strip()
+
 
 def process_results_text_generation(doc, results):
-    """
-    Procesa los resultados de generación de texto.
-    """
-
-
-
     pred = results[0] if isinstance(results, list) else results
     targets = doc["parsed_respuesta"]
 
-
-    # 2. Dynamic Character Analysis
     allowed_specials = {
-        char for t in targets 
-        for char in t 
-        if not char.isalnum() and not char.isspace()
+        char for target in targets for char in target if not char.isalnum() and not char.isspace()
     }
-    
-    # Comprobamos si la predicción está en los targets (ignorando mayúsculas y puntuación)
     pred_clean = clean_text(pred, allowed_specials)
-    targets_clean = [clean_text(t, allowed_specials) for t in targets]
-    
+    targets_clean = [clean_text(target, allowed_specials) for target in targets]
+
     acc = 1.0 if pred_clean in targets_clean else 0.0
-    
-    dificultad = doc.get("Metadata", {}).get("Dificultad", "Desconocida")
-    
+    difficulty = doc.get("Metadata", {}).get("Dificultad", "Desconocida")
+    subtask = doc['Subtarea']
     return {
         "exact_match": acc,
-        f"exact_match_{dificultad}": acc
+        f"exact_match_{difficulty}": acc,
+        f"exact_match_{subtask}": acc
     }

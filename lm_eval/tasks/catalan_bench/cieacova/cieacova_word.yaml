@@ -1,61 +1,57 @@
 task: cieacova_word
-dataset_path: parquet
+custom_dataset: !function utils.load_cieacova_dataset
 dataset_kwargs:
-  data_files: /home/gplsi/santi/translate_datasets/cieacova/text-generation.parquet
+  dataset_repo: gplsi/cieacova
+  dataset_name: text_generation
 process_docs: !function utils.process_gen_docs
 output_type: generate_until
-training_split: null
+training_split: train
 validation_split: null
-test_split: train
-doc_to_text: "Exercici:\n{{Instrucción}}\n\n{{rules}}\n\n{{dynamic_fewshot}}Text a resoldre:\n{{Pregunta}}\n\n{% if Pista %}PISTA:\n{{Pista}}\n\n{% endif %}Resposta:\n\n"
-#doc_to_text: "{{Instrucción}}\n\n{{rules}}\n:\n{{Pregunta}}\n\n{% if Pista %}Pista:\n{{Pista}}\n\n{% endif %}Solució:"
-doc_to_target: "{{parsed_respuesta}}"
+test_split: test
+num_fewshot: 0
+doc_to_text: "{{Instrucción}}\n\n{{dynamic_fewshot}}Text a resoldre:\n{{Pregunta}}\n\n{% if Pista %}PISTA:\n{{Pista}}\n\n{% endif %}Resposta:\n"
+doc_to_target: "{{parsed_respuesta[0]}}"
 should_decontaminate: true
-
-# CORRECCIÓN 1: No existe la columna "goal". Usamos "Pregunta".
-doc_to_decontamination_query: "{{parsed_respuesta}}"
+doc_to_decontamination_query: "{{Pregunta}}"
 process_results: !function utils.process_results_text_generation
-
-# AÑADIDO 1: Parámetros de generación (¡Imprescindible para generate_until!)
 generation_kwargs:
   until:
     - "\n"
-    - "."
-  max_gen_toks: 10
+  max_gen_toks: 20
   temperature: 0.0
 
-# AÑADIDO 2: Métricas integradas del framework
 metric_list:
   - metric: exact_match
     aggregation: mean
     higher_is_better: true
-    ignore_case: true
-    ignore_punctuation: true
   
   - metric: exact_match_B1
     aggregation: mean
     higher_is_better: true
-    ignore_case: true
-    ignore_punctuation: true
   
   - metric: exact_match_B2
     aggregation: mean
     higher_is_better: true
-    ignore_case: true
-    ignore_punctuation: true
   
   - metric: exact_match_C1
     aggregation: mean
     higher_is_better: true
-    ignore_case: true
-    ignore_punctuation: true
   
   - metric: exact_match_C2
     aggregation: mean
     higher_is_better: true
-    ignore_case: true
-    ignore_punctuation: true
-
+  
+  - metric: exact_match_text
+    aggregation: mean
+    higher_is_better: true
+  
+  - metric: exact_match_oracions
+    aggregation: mean
+    higher_is_better: true
+  
+  - metric: exact_match_definició
+    aggregation: mean
+    higher_is_better: true
 
 metadata:
   version: 1.0
