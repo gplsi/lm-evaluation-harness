@@ -11,7 +11,9 @@ echo "Executing English commands..."
 
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" xstorycloze_en,xnli_en,triviaqa,paws_en,belebele_eng_Latn $SHOTS False $WANDB 1_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/1_English.txt" 2>&1 || true
 
-yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" coqa $SHOTS False $WANDB 2_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_English.txt" 2>&1 || true
+#yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" coqa $SHOTS False $WANDB 2_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_English.txt" 2>&1 || true
+
+yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" coqa 0 False $WANDB 2_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_English.txt" 2>&1 || true
 
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" piqa $SHOTS False $WANDB 3_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_English.txt" 2>&1 || true
 
@@ -26,5 +28,4 @@ yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" openbookqa $SHOTS Fal
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" arc_easy $SHOTS False $WANDB 8_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/8_English.txt" 2>&1 || true
 
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" arc_challenge $SHOTS False $WANDB 9_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/9_English.txt" 2>&1 || true
-
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" social_iqa $SHOTS False $WANDB 10_English $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/10_English.txt" 2>&1 || true

@@ -1,0 +1,7 @@
+group: cieacova
+task:
+  - cieacova_choice
+  - cieacova_choice_gen
+  - cieacova_word
+metadata:
+  version: 1.0

@@ -103,12 +103,12 @@ else
                             --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size auto \
+                            --batch_size 5 \
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234 \
-                            --apply_chat_template \
-                            --wandb_args project=$wandb,entity=gplsi_continual
+                            --apply_chat_template #\
+                            #--wandb_args project=$wandb,entity=gplsi_continual
             else
                 accelerate launch --main_process_port  $PORT \
                             -m lm_eval --model hf \
@@ -119,8 +119,8 @@ else
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234 \
-                            --apply_chat_template \
-                            --wandb_args project=$wandb,entity=gplsi_continual
+                            --apply_chat_template #\
+                            #--wandb_args project=$wandb,entity=gplsi_continual
             fi
 
         else
@@ -131,22 +131,23 @@ else
                             --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 20 \
+                            --batch_size 5 \
                             --output_path $output_dir \
                             --log_samples \
-                            --seed 1234 \
-                            --wandb_args project=$wandb,entity=gplsi_continual
+                            --seed 1234 #\
+                            #--wandb_args project=$wandb,entity=gplsi_continual
             else
                 accelerate launch --main_process_port  $PORT \
-                            -m lm_eval --model vllm \
+                            -m lm_eval --model hf \
                             --model_args pretrained=$model,trust_remote_code=True \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 20 \
+                            --batch_size 5 \
                             --output_path $output_dir \
                             --log_samples \
-                            --seed 1234 \
-                            --wandb_args project=$wandb,entity=gplsi_continual
+                            --seed 1234
+                            #--apply_chat_template #\
+                            #--wandb_args project=$wandb,entity=gplsi_continual
             fi
         fi
     fi

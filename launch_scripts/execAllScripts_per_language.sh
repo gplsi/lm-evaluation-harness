@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Check if correct number of arguments are passed
 if [ "$#" -ne 7 ]; then
@@ -16,7 +17,7 @@ WANDB=$2
 INSTRUCT=$3 # INSTRUCT="True" means that the model is instruccion-tuned and has to be evalutaed with an speciifc flag
 SHOTS=$4 # Number of shots for the tasks, 0 means no shots
 IFS=',' read -r -a arr_languages <<< $5 # Languages to evaluate, separated by commas stored in arr_a  
-OUTPUT_DIR= $6
+OUTPUT_DIR=$6
 VLLM=$7
 
 #echo $INSTRUCT

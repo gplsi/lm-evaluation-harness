@@ -3,7 +3,7 @@
 #SBATCH --output=%j.out
 #SBATCH --error=%j.err          
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=16G                      
+#SBATCH --mem=32G                      
 #SBATCH --partition=dgx          
 #SBATCH --gres=gpu:1
 

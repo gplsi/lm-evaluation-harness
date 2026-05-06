@@ -1,0 +1,22 @@
+evaluation_name: "aitana-s2b-c6dc40-42x44-46-51_evaluation"
+description: "Configuration file for evaluation of base_llm_Models"
+
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  models_names: e-001-gs-000353,e-001-gs-001060,e-001-gs-001766 #e-001-gs-000706  e-001-gs-001413  e-001-gs-002120
+  models_path: /home/gplsi/GPLSI/ALIA/modelos/Continual/aitana-2b-c6dc40-42x44-46-51/hf_models # List of paths to the models to be evaluated
+
+evaluation:
+  evaluation_folder: /home/gplsi/GPLSI/ALIA/modelos/Continual/aitana-2b-c6dc40-42x44-46-51/evaluaciones # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /home/gplsi/GPLSI/ALIA/modelos/Evaluation/Continual/gold # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: False
+  shots: 5 # Number of shots to be used in the evaluation
+
+wandb_project: "aitana-s2b-c6dc40-42x44-46-51_evaluation" # Name of the wandb project to log the results
+
+languages:
+  - Spanish: True # Set to true if want to evaluate the model in Spanish tasks
+  - English: True # Set to true if want to evaluate the model in English tasks
+  - Valencian: True # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: True # Set to true if want to evaluate the model in Catalan tasks

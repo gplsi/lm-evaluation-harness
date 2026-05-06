@@ -4,7 +4,6 @@ import pandas as pd
 import re
 from datetime import datetime
 import argparse
-import shutil
 
 N=1 # CONSTANTE PARA RESALTAR VALORES
 
@@ -163,6 +162,27 @@ def process_all_folders_combined(main_root_folder):
     df_configs = pd.DataFrame(all_configs)
     return df_results, df_configs
 
+
+def process_multiple_roots(main_root_folders):
+    """
+    Procesa varias carpetas raíz y concatena los resultados de todas ellas
+    sin copiar archivos a ubicaciones temporales.
+    """
+    all_results = []
+    all_configs = []
+
+    for folder in main_root_folders:
+        df_results_part, df_configs_part = process_all_folders_combined(folder)
+        if not df_results_part.empty:
+            all_results.append(df_results_part)
+        if not df_configs_part.empty:
+            all_configs.append(df_configs_part)
+
+    df_results = pd.concat(all_results, ignore_index=True) if all_results else pd.DataFrame()
+    df_configs = pd.concat(all_configs, ignore_index=True) if all_configs else pd.DataFrame()
+
+    return df_results, df_configs
+
 # -----------------------------------------------------------------------------
 # PROCESAMIENTO POSTERIOR: EXTRAER INFO DEL NOMBRE DEL ARCHIVO
 # -----------------------------------------------------------------------------
@@ -284,9 +304,12 @@ def merge_dataframes(df_configs, df_results_pivot):
 ###
 # Función que genera una dataframe con los resultados unidos e enriquecidos.
 ###
-def generate_results(main_root_folder):
+def generate_results(main_root_folders):
+    if isinstance(main_root_folders, str):
+        main_root_folders = [main_root_folders]
+
     # Se procesan todas las carpetas y se extraen tanto resultados como configuraciones en una sola pasada
-    df_results, df_configs = process_all_folders_combined(main_root_folder)
+    df_results, df_configs = process_multiple_roots(main_root_folders)
     
     # Enriquecer ambos DataFrames con la información extraída del nombre del archivo
     if not df_results.empty:
@@ -396,9 +419,17 @@ def highlight_nsmallest_nlargest(s, n=N):
 # Función auxiliar para normalizar los scores de los modelos por idioma.
 #### -----------------------------------------------------------------------------
 def normalized_value(row, column):
+    score = row[column]
+    metric = row['metric']
 
-    raw_metric = row[column] if row['metric'] in ['bleu', 'chrf', 'mcc', 'exact_match'] else row[column]*100
-    #raw_metric = row[column]
+    # Some tasks already emit percentage-like values for custom metrics
+    # (for example truthfulqa_va_gen returns BLEU/ROUGE in the 0..100 range).
+    # Keep those values as-is and only scale bounded 0..1 metrics to percentages.
+    if metric in ['bleu', 'chrf', 'mcc', 'exact_match'] or abs(score) > 1:
+        raw_metric = score
+    else:
+        raw_metric = score * 100
+
     random_score = row['random']
     max_score = row['Max']
     return (raw_metric - random_score) / (max_score - random_score)
@@ -436,6 +467,20 @@ def normalize_models_score_by_language(df):
     return df_mean
 
 
+
+def add_language_to_general_report(df):
+    script_dir = os.path.dirname(os.path.abspath(__file__)) 
+    normalized_dict = os.path.join(script_dir, 'language_task_map.xlsx')
+    df_normalized_dict = pd.read_excel(normalized_dict)
+
+    language_task_map = dict(zip(df_normalized_dict['task'], df_normalized_dict['language']))
+    columns = df.columns.tolist()[0:2]
+    df.dropna(subset=columns, inplace=True)
+    df['language'] = df['task'].map(language_task_map)
+    
+    return df
+
+
 #### -----------------------------------------------------------------------------
 # Aplicar estilos a los resultados para visualizar mejor los datos.
 #### -----------------------------------------------------------------------------
@@ -449,10 +494,13 @@ def style_results(df,root_folder):
 
     #df = df[~df.language.isin(exclude_language)].reset_index(drop=True)
     df.drop(columns=['output_type','Random','language'], inplace=True)
+    
     # Eliminar métricas que contienen '_norm'
     df = df[df['metric'].apply(lambda x: '_norm' not in x )].reset_index(drop=True)
     df_norm = normalize_models_score_by_language(df)
-    df = df.set_index(['task', 'metric'])
+    df = add_language_to_general_report(df)
+
+    df = df.set_index(['task', 'metric','language'])
     #df.sort_index(level='language',inplace=True)
 
     
@@ -477,25 +525,22 @@ if __name__ == "__main__":
     argparser.add_argument('--evaluation_folder_gold', type=str, default="../results/",
                            help="Ruta al directorio principal donde se encuentran los mejores resultados.")
     args = argparser.parse_args()
-    
+
     main_root_folder = args.evaluation_folder + "/results/"
-    
     main_root_folder_gold = args.evaluation_folder_gold + "/results/"
-    
-    if os.path.exists(main_root_folder_gold):
-        temp_folder = args.evaluation_folder + "/temp/"
-        # os.mkdir(temp_folder) if not os.path.exists(temp_folder) else None
-        shutil.copytree(main_root_folder_gold, temp_folder, dirs_exist_ok=True)
-        shutil.copytree(main_root_folder, temp_folder, dirs_exist_ok=True)
-        main_root_folder = temp_folder
-    else:
-        
-        print(f"❌ No se encontró la carpeta de resultados: {main_root_folder_gold}")
+
+    root_folders = []
+
+    for folder in [main_root_folder_gold, main_root_folder]:
+        if os.path.exists(folder):
+            root_folders.append(folder)
+        else:
+            print(f"❌ No se encontró la carpeta de resultados: {folder}")
+
+    if not root_folders:
         exit(1)
-    
-    df = generate_results(main_root_folder)
-    if "temp" in main_root_folder:
-        shutil.rmtree(main_root_folder)
+
+    df = generate_results(root_folders)
     
     results_folder = args.evaluation_folder + "/reports/"
     os.mkdir(results_folder) if not os.path.exists(results_folder) else None
