@@ -103,7 +103,7 @@ else
                             --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 5 \
+                            --batch_size 15 \
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234 \
@@ -115,7 +115,7 @@ else
                             --model_args pretrained=$model,trust_remote_code=True \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 20 \
+                            --batch_size 15 \
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234 \
@@ -131,7 +131,7 @@ else
                             --model_args pretrained=$model \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 5 \
+                            --batch_size 15 \
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234 #\
@@ -142,7 +142,7 @@ else
                             --model_args pretrained=$model,trust_remote_code=True \
                             --tasks ${dataset} \
                             --num_fewshot $few_shot \
-                            --batch_size 5 \
+                            --batch_size 15 \
                             --output_path $output_dir \
                             --log_samples \
                             --seed 1234

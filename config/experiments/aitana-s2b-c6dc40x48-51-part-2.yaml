@@ -4,12 +4,12 @@ description: "Configuration file for evaluation of base_llm_Models"
 
 models:
   local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
-  models_names: e-001-gs-002147,e-001-gs-002684,e-001-gs-003221
-  models_path: /home/gplsi/GPLSI/ALIA/modelos/Continual/aitana-2b-c6dc40x48-51/hf_models # List of paths to the models to be evaluated
+  models_names: e-001-gs-001610,e-001-gs-002147 #  e-001-gs-002147  e-001-gs-002684  e-001-gs-003221 
+  models_path: /leonardo_scratch/large/userexternal/sgaliano/output/aitana-2b-c6dc40x48-51_hf # List of paths to the models to be evaluated
 
 evaluation:
-  evaluation_folder: /home/gplsi/GPLSI/ALIA/modelos/Continual/aitana-2b-c6dc40x48-51/evaluaciones # Path to the folder where the evlaluation results will be stored
-  evaluation_folder_gold: /home/gplsi/GPLSI/ALIA/modelos/Evaluation/Continual/gold # Path where results of other evaluations are stored to be included in the final evaluation
+  evaluation_folder: /leonardo_scratch/large/userexternal/sgaliano/output/aitana-2b-c6dc40x48-51_hf/evaluaciones # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /leonardo_scratch/large/userexternal/sgaliano/evaluaciones_gold/Continual/gold # Path where results of other evaluations are stored to be included in the final evaluation
   instruct: False
   shots: 5 # Number of shots to be used in the evaluation
 

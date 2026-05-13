@@ -1,0 +1,23 @@
+evaluation_name: "Qwen-v-long-sequence-3-epoch-evaluation"
+description: "Configuration file for evaluation of instruction-following models."
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  #models_names: final,step-010240,step-012800,step-015360 # List of models nambes to be evaluated
+  models_names: final,step-003058,step-006116
+  models_path: /home/gplsi/GPLSI/ALIA/modelos/Instruction/ALIA_instruction_qwen_2b_v2_data_v12_va_fsdp_chat_3_language_long_sequence_3_epoch/hf_models # List of paths to the models to be evaluated
+
+evaluation:
+  evaluation_folder: /home/gplsi/GPLSI/ALIA/modelos/Instruction/ALIA_instruction_qwen_2b_v2_data_v12_va_fsdp_chat_3_language_long_sequence_3_epoch/evaluaciones # Path to the folder where the evlaluation results will be stored  
+  evaluation_folder_gold: /home/gplsi/GPLSI/ALIA/modelos/Evaluation/Instruction/gold # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: True
+  shots: 0 # Number of shots to be used in the evaluation
+
+wandb_project: "v2-qwen-long-sequence-3-epoch-instruct-evaluation" # Name of the wandb project to log the results
+
+
+languages:
+  - Spanish: false # Set to true if want to evaluate the model in Spanish tasks
+  - English: false # Set to true if want to evaluate the model in English tasks
+  - Valencian: false # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: true # Set to true if want to evaluate the model in Catalan tasks

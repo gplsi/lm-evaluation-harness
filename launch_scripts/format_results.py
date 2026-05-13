@@ -462,8 +462,22 @@ def normalize_models_score_by_language(df):
     df_mean = df_subset.groupby('language').mean().reset_index()
     df_mean.set_index('language', inplace=True)
     df_mean = df_mean.T
+
+    language_columns = df_mean.columns.tolist()
+    df_mean["Average"] = df_mean.mean(axis=1)
+
+    # Posicion global por idioma (1 = mejor)
+    for language in language_columns:
+        safe_language = str(language).replace(" ", "_")
+        df_mean[f"Position_{safe_language}"] = df_mean[language].rank(
+            ascending=False, method="min"
+        ).astype(int)
+
     df_mean.sort_values(by=['Valencian','Catalan','Spanish', 'English'], inplace=True, ascending=False)
-    df_mean = df_mean.style.apply(highlight_nsmallest_nlargest, axis=0)
+    score_columns = language_columns + ["Average"]
+    df_mean = df_mean.style.apply(
+        highlight_nsmallest_nlargest, axis=0, subset=score_columns
+    )
     return df_mean
 
 

@@ -6,12 +6,14 @@ GPU_COUNT=2
 PARTITION="dgx"
 MEMORY="32G"
 VLLM=false
+QOS=""
+TIME=""
 
 # ACTIVATE HARDNESS ENVIRONMENT
 source /home/gplsi/rst29/anaconda3/etc/profile.d/conda.sh
 conda activate hardness
 
-while getopts ":c:dg:m:p:v" opt; do
+while getopts ":c:dg:m:p:vq:t:" opt; do
   case $opt in
     c)
       CONFIG_FILE="$OPTARG"
@@ -27,6 +29,12 @@ while getopts ":c:dg:m:p:v" opt; do
       ;;
     p)
       PARTITION="$OPTARG"
+      ;;
+    q)
+      QOS="$OPTARG"
+      ;;
+    t)
+      TIME="$OPTARG"
       ;;
     v)
       VLLM=true
@@ -45,7 +53,7 @@ done
 # Check required -c argument
 if [[ -z "$CONFIG_FILE" ]]; then
   echo "Error: -c <config_file.yaml> is required"
-  echo "Usage: $0 -c <config_file.yaml> [-d] [-g <gpu_count>] [-m <memory>] [-p <partition>] [-v]"
+  echo "Usage: $0 -c <config_file.yaml> [-d] [-g <gpu_count>] [-m <memory>] [-p <partition>] [-q <qos>] [-t <time>] [-v]"
   exit 1
 fi
 
@@ -109,6 +117,18 @@ else
       -e "s|#SBATCH --mem=32G|#SBATCH --mem=$MEMORY|g" \
       -e "s|source .env|source ./experiments/$JOB_ID/$ENV_FILE|g" \
       base_contract_conda.slurm > $TMP_SCRIPT
+fi
+
+# If QoS was specified, insert an SBATCH qos line after the partition line
+if [ -n "$QOS" ]; then
+  echo "Applying QoS: $QOS to SLURM script"
+  sed -i "/#SBATCH --partition=$PARTITION/a #SBATCH --qos=$QOS" $TMP_SCRIPT
+fi
+
+# If time limit was specified, insert an SBATCH time line after the mem line
+if [ -n "$TIME" ]; then
+  echo "Applying time limit: $TIME to SLURM script"
+  sed -i "/#SBATCH --mem=$MEMORY/a #SBATCH --time=$TIME" $TMP_SCRIPT
 fi
 
 # Make it executable

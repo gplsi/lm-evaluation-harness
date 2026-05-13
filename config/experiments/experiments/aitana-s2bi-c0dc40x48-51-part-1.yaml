@@ -1,0 +1,22 @@
+evaluation_name: "aitana-s2bi-c0dc40x48-51_evaluation"
+description: "Configuration file for evaluation of base_llm_Models"
+
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  models_names: e-001-gs-000536,e-001-gs-001073 #e-001-gs-001766 #,e-001-gs-000706,e-001-gs-001413,e-001-gs-002120 #e-001-gs-001060,e-001-gs-001325,e-001-gs-001591
+  models_path: /leonardo_scratch/large/userexternal/sgaliano/output/aitana-s2bi-c0dc40x48-51_hf # List of paths to the models to be evaluated
+
+evaluation:
+  evaluation_folder: /leonardo_scratch/large/userexternal/sgaliano/output/aitana-s2bi-c0dc40x48-51_hf/evaluaciones_instruct # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /leonardo_scratch/large/userexternal/sgaliano/evaluaciones_gold/Continual/gold # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: True
+  shots: 0 # Number of shots to be used in the evaluation
+
+wandb_project: "aitana-s2bi-c0dc40x48-51_evaluation" # Name of the wandb project to log the results
+
+languages:
+  - Spanish: True # Set to true if want to evaluate the model in Spanish tasks
+  - English: True # Set to true if want to evaluate the model in English tasks
+  - Valencian: True # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: True # Set to true if want to evaluate the model in Catalan tasks

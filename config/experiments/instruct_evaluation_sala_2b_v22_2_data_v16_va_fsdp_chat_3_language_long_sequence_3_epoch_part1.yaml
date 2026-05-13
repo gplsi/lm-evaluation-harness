@@ -1,0 +1,22 @@
+evaluation_name: "Aitana-v22-long-sequence-3-epoch-evaluation"
+description: "Configuration file for evaluation of instruction-following models."
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  models_names: final,step-003138 #  step-006276  step-009414  step-012552  step-015690  step-018828
+  models_path: /leonardo_work/EUHPC_D22_034/modelos/Instruction/ALIA_instruction_sala_2b_v22_2_data_v16_va_fsdp_long_sequence_3_epoch/hf_models
+
+evaluation:
+  evaluation_folder: /leonardo_work/EUHPC_D22_034/modelos/Instruction/ALIA_instruction_sala_2b_v22_2_data_v16_va_fsdp_long_sequence_3_epoch/evaluaciones # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /leonardo_scratch/large/userexternal/sgaliano/evaluaciones_instruct_gold  # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: True
+  shots: 0 # Number of shots to be used in the evaluation
+
+wandb_project: "v22-long-sequence-3-epoch-instruct-evaluation" # Name of the wandb project to log the results
+
+
+languages:
+  - Spanish: true # Set to true if want to evaluate the model in Spanish tasks
+  - English: true # Set to true if want to evaluate the model in English tasks
+  - Valencian: true # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: true # Set to true if want to evaluate the model in Catalan tasks
