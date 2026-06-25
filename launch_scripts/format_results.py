@@ -400,19 +400,23 @@ def generate_results(main_root_folders):
 # Función para aplicar estilo
 #### -----------------------------------------------------------------------------
 def highlight_nsmallest_nlargest(s, n=N):
-    is_min = s.isin(s.nsmallest(n))  # Identifica los N valores más pequeños
-    is_max = s.isin(s.nlargest(n))   # Identifica los N valores más grandes
+    # Coerce to numeric so styling doesn't fail on object dtype columns.
+    numeric = pd.to_numeric(s, errors="coerce")
+    if numeric.notna().sum() == 0:
+        return ['' for _ in s]
 
-    if s.name[1] == 'ter':
+    is_min = numeric.isin(numeric.nsmallest(n))  # Identifica los N valores más pequeños
+    is_max = numeric.isin(numeric.nlargest(n))   # Identifica los N valores más grandes
+
+    is_ter = isinstance(s.name, tuple) and len(s.name) > 1 and s.name[1] == 'ter'
+    if is_ter:
         return ['background-color: lightcoral' if v else 
                 'background-color: lightgreen' if w else 
                 '' for v, w in zip(is_max, is_min)]
-    else:
-        is_min = s.isin(s.nsmallest(n))  # Identifica los N valores más pequeños
-        is_max = s.isin(s.nlargest(n))   # Identifica los N valores más grandes
-        return ['background-color: lightcoral' if v else 
-                'background-color: lightgreen' if w else 
-                '' for v, w in zip(is_min, is_max)]
+
+    return ['background-color: lightcoral' if v else 
+            'background-color: lightgreen' if w else 
+            '' for v, w in zip(is_min, is_max)]
 
 
 #### ----------------------------------------------------------------------------#
@@ -465,6 +469,27 @@ def normalize_models_score_by_language(df):
 
     language_columns = df_mean.columns.tolist()
     df_mean["Average"] = df_mean.mean(axis=1)
+
+
+    nan_rows = df_mean[df_mean.isna().any(axis=1)]
+    if not nan_rows.empty:
+        print("\n" + "="*90)
+        print("⚠️  DEBUG LOG: Models with missing (NaN) evaluations:")
+        print("="*90)
+        
+        # This prevents Pandas from truncating long strings with '...'
+        with pd.option_context('display.max_colwidth', None, 'display.max_columns', None, 'display.width', 1000):
+            print(nan_rows)
+            
+        print("\n📋 FULL UNTRUNCATED NAMES FOR COPIAL/PASTE:")
+        for full_name in nan_rows.index:
+            print(f"  • {full_name}")
+        print("="*90 + "\n")
+
+    # Ranking global por el promedio (1 = mejor)
+    df_mean["Position_Average"] = df_mean["Average"].rank(
+        ascending=False, method="min"
+    ).astype(int)
 
     # Posicion global por idioma (1 = mejor)
     for language in language_columns:

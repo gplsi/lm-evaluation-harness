@@ -16,7 +16,7 @@ wandb_project: "v22-long-sequence-3-epoch-instruct-evaluation" # Name of the wan
 
 
 languages:
-  - Spanish: true # Set to true if want to evaluate the model in Spanish tasks
-  - English: true # Set to true if want to evaluate the model in English tasks
+  - Spanish: false # Set to true if want to evaluate the model in Spanish tasks
+  - English: false # Set to true if want to evaluate the model in English tasks
   - Valencian: true # Set to true if want to evaluate the model in Valencian tasks
-  - Catalan: true # Set to true if want to evaluate the model in Catalan tasks
+  - Catalan: false # Set to true if want to evaluate the model in Catalan tasks

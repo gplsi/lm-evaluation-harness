@@ -12,3 +12,4 @@ yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" cocoteros_va $SHOTS F
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" xnli_va $SHOTS False $WANDB 2_Valencian $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/2_Valencian.txt" 2>&1 || true
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" truthfulqa_va_gen $SHOTS False $WANDB 3_Valencian $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/3_Valencian.txt" 2>&1 || true
 yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" phrases_va,phrases_es $SHOTS False $WANDB 4_Valencian $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/4_Valencian.txt" 2>&1 || true
+yes | ./launch_scripts/execute_task_love.sh "$MODEL_ROUTE" cieacova $SHOTS False $WANDB 5_Valencian $INSTRUCT $VLLM > "$OUTPUT_MAIN_DIR/$OUTPUT_SUBFOLDER/5_Valencian.txt" 2>&1 || true

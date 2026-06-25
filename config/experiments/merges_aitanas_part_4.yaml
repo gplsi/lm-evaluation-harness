@@ -1,0 +1,23 @@
+evaluation_name: "instruct_evaluaction_aitana_7b_v23_data_v16_va_"
+description: "Configuration file for evaluation of instruction-following models."
+
+models:
+  local: True # Set to True if the model is hosted locally of False if it is evlauated from huggingface
+  models_names: aitana_merge_7,aitana_merge_8
+  models_path: /leonardo_work/EUHPC_D22_034/modelos/Merged
+
+
+evaluation:
+  evaluation_folder: /leonardo_work/EUHPC_D22_034/modelos/evaluaciones_merged # Path to the folder where the evlaluation results will be stored
+  evaluation_folder_gold: /leonardo_scratch/large/userexternal/sgaliano/evaluaciones_instruct_gold # Path where results of other evaluations are stored to be included in the final evaluation
+  instruct: True
+  shots: 0 # Number of shots to be used in the evaluation
+
+wandb_project: "v22-long-sequence-3-epoch-instruct-evaluation" # Name of the wandb project to log the results
+
+
+languages:
+  - Spanish: true # Set to true if want to evaluate the model in Spanish tasks
+  - English: true # Set to true if want to evaluate the model in English tasks
+  - Valencian: true # Set to true if want to evaluate the model in Valencian tasks
+  - Catalan: true # Set to true if want to evaluate the model in Catalan tasks

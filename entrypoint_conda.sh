@@ -13,3 +13,7 @@ IFS=',' read -r -a arr_models <<< $MODELS_TO_EVALUATE
 
 
 python3 -m launch_scripts.format_results --evaluation_folder $EVALUATION_FOLDER --evaluation_folder_gold $EVALUATION_FOLDER_GOLD
+
+
+
+python3 -m launch_scripts.format_results --evaluation_folder /home/gplsi/GPLSI/ALIA/modelos/Instruction/Qwen/evaluaciones --evaluation_folder_gold /home/gplsi/gplsinas/ALIA/modelos/Instruction/Axolotl_exp/evaluaciones_instruct_gold_new
